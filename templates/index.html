@@ -24,21 +24,21 @@
         h1 {
             color: #333;
             text-align: center;
+            margin-bottom: 30px;
         }
         .input-container {
             display: flex;
-            margin: 15px 0;
             justify-content: center;
-            align-items: center;
-            flex-wrap: wrap; /* 允许在小屏幕上换行 */
+            margin-bottom: 20px;
+            gap: 10px;
         }
         .input-container input {
-            padding: 10px;
-            font-size: 16px;
+            padding: 10px 15px;
             border: 1px solid #ddd;
             border-radius: 4px;
-            margin-right: 10px;
-            margin-bottom: 5px; /* 在小屏幕上换行时的间距 */
+            font-size: 16px;
+            flex-grow: 1;
+            max-width: 400px;
         }
         .input-container button {
             padding: 10px 20px;
@@ -48,7 +48,7 @@
             border-radius: 4px;
             cursor: pointer;
             font-size: 16px;
-            margin-bottom: 5px; /* 在小屏幕上换行时的间距 */
+            transition: background-color 0.3s;
         }
         .input-container button:hover {
             background-color: #45a049;
@@ -67,37 +67,49 @@
         .modal {
             display: none;
             position: fixed;
-            top: 0;
+            z-index: 9999;
             left: 0;
+            top: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
+            background-color: white;
+            overflow: auto;
         }
         .modal-content {
-            background-color: white;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .modal-header {
+            padding: 10px 16px;
+            background-color: #f8f8f8;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-body {
             padding: 20px;
-            border-radius: 8px;
-            max-width: 400px;
-            text-align: center;
+            flex: 1;
+            overflow: auto;
         }
         .close {
             color: #aaa;
-            float: right;
             font-size: 28px;
             font-weight: bold;
             cursor: pointer;
         }
-        .close:hover {
+        .close:hover,
+        .close:focus {
             color: black;
+            text-decoration: none;
         }
         .chapter-info {
-            margin-bottom: 15px;
             text-align: center;
+            font-size: 24px;
             font-weight: bold;
-            font-size: 18px;
+            margin: 20px 0;
         }
         /* 控制面板样式 */
         .control-panel {
@@ -254,7 +266,63 @@
             background-color: #333;
         }
         
-        /* 全屏模式下的样式 */
+        .content-display {
+            background-color: white;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-top: 10px;
+            line-height: 1.6;
+        }
+        
+        /* 全屏遮罩层 */
+        .fullscreen-overlay {
+            display: none; /* 初始状态隐藏 */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw; /* 使用视口宽度单位 */
+            height: 100vh; /* 使用视口高度单位 */
+            background-color: white;
+            z-index: 9999;
+            overflow: auto;
+        }
+        
+        .fullscreen-header {
+            position: sticky;
+            top: 0;
+            padding: 10px;
+            background-color: #f8f8f8;
+            border-bottom: 1px solid #ddd;
+            text-align: right;
+            width: 100%; /* 确保宽度为100% */
+        }
+        
+        .exit-fullscreen-btn {
+            display: inline-block; /* 确保按钮显示为块级元素 */
+            padding: 5px 10px;
+            background-color: #555;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            min-width: 80px; /* 设置最小宽度 */
+            min-height: 30px; /* 设置最小高度 */
+        }
+        
+        .fullscreen-content {
+            padding: 20px;
+            line-height: 1.6;
+            min-height: 100px; /* 设置最小高度 */
+        }
+        
+        /* 当处于全屏模式时，隐藏滚动条 */
+        body.fullscreen-mode {
+            overflow: hidden !important; /* 使用!important确保优先级 */
+        }
+
+        /* 全屏模式样式 */
         #contentDisplay.fullscreen-active {
             background-color: white;
             padding: 20px;
@@ -354,6 +422,174 @@
                 margin-bottom: 10px;
             }
         }
+
+
+        /* 全屏模式样式 */
+        .fullscreen-mode {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #f9f9f9;
+            z-index: 2000;
+            overflow: auto;
+            padding: 0px;
+            box-sizing: border-box;
+        }
+
+        /* 模态框样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: white;
+            overflow: auto;
+        }
+
+        .modal-content {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-header {
+            padding: 10px 16px;
+            background-color: #f8f8f8;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-body {
+            padding: 20px;
+            flex: 1;
+            overflow: auto;
+        }
+
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+        }
+
+        #contentDisplay {
+            background-color: white;
+            padding: 20px;
+            border: 1px solid #ddd;  /* 添加边框 */
+            border-radius: 8px;      /* 添加圆角 */
+            margin-top: 15px;
+            line-height: 1.6;
+            max-height: 70vh;        /* 限制最大高度为视口高度的70% */
+            overflow-y: auto;        /* 内容过多时显示滚动条 */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);  /* 添加阴影效果 */
+        }
+
+        /* 如果您想让整个内容区域有边框，也可以添加以下样式 */
+        .fullscreen-container {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-top: 20px;
+            position: relative;
+        }
+
+        /* 内容容器样式 */
+        .content-container {
+            position: relative;
+            margin-top: 20px;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* 全屏按钮样式 */
+        .fullscreen-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 5px 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            z-index: 10;
+        }
+
+        .fullscreen-btn:hover {
+            background-color: #45a049;
+        }
+
+        /* 内容显示区域样式 */
+        .content-display {
+            margin-top: 30px; /* 为全屏按钮留出空间 */
+            line-height: 1.6;
+        }
+
+        /* 全屏模态框样式 */
+        .fullscreen-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: white;
+            z-index: 9999;
+            overflow: auto;
+        }
+
+        .fullscreen-header {
+            position: sticky;
+            top: 0;
+            padding: 10px;
+            background-color: #f8f8f8;
+            border-bottom: 1px solid #ddd;
+            text-align: right;
+            z-index: 1000;
+        }
+
+        .close-fullscreen-btn {
+            padding: 5px 10px;
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .close-fullscreen-btn:hover {
+            background-color: #d32f2f;
+        }
+
+        .fullscreen-content {
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        /* 当处于全屏模式时，隐藏滚动条 */
+        body.fullscreen-mode {
+            overflow: hidden;
+        }
     </style>
 </head>
 <body>
@@ -382,9 +618,11 @@
         <div class="chapter-info" id="chapterInfo">
             {% if title %}<h2>{{ title }}</h2>{% endif %}
         </div>
-        <div class="fullscreen-container">
+        <div class="content-container">
             <button id="fullscreenBtn" class="fullscreen-btn">全屏显示</button>
-            <div id="contentDisplay">{% if content %}{{ content | safe }}{% endif %}</div>
+            <div id="contentDisplay" class="content-display">
+                {% if content %}{{ content | safe }}{% endif %}
+            </div>
         </div>
     </div>
 
@@ -427,620 +665,162 @@
         </div>
     </div>
 
+    <!-- 全屏模式弹窗 -->
+    <div id="fullscreenModal" class="fullscreen-modal">
+        <div class="fullscreen-header">
+            <button id="closeFullscreenBtn" class="close-fullscreen-btn">退出全屏</button>
+        </div>
+        <div id="fullscreenContent" class="fullscreen-content"></div>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const urlInput = document.getElementById('urlInput');
-            const loadButton = document.getElementById('loadButton');
-            const contentDisplay = document.getElementById('contentDisplay');
-            const chapterInfo = document.getElementById('chapterInfo');
-            const modal = document.getElementById('modal');
-            const modalMessage = document.getElementById('modalMessage');
-            const closeBtn = document.querySelector('.close');
-
-            // 控制面板元素
-            const fontSizeSlider = document.getElementById('fontSize');
-            const fontSizeInput = document.getElementById('fontSizeInput');
-            const letterSpacingSlider = document.getElementById('letterSpacing');
-            const letterSpacingInput = document.getElementById('letterSpacingInput');
-            const lineHeightSlider = document.getElementById('lineHeight');
-            const lineHeightInput = document.getElementById('lineHeightInput');
-            const panelContent = document.querySelector('.panel-content');
-            const togglePanelBtn = document.getElementById('togglePanel');
-            const showPanelBtn = document.getElementById('showPanelBtn');
-
-            // 背景颜色控制元素
-            const bgColorPicker = document.getElementById('bgColorPicker');
-            const bgColorInput = document.getElementById('bgColorInput');
-
-            // 获取DOM元素
-            const bookInput = document.getElementById('bookInput');
-            const chapterInput = document.getElementById('chapterInput');
-            const versionInput = document.getElementById('versionInput');
-            const generateUrlButton = document.getElementById('generateUrlButton');
-            const urlInput = document.getElementById('urlInput');
-            const loadButton = document.getElementById('loadButton');
-
-            // 书名映射表（中文书名到英文缩写）
-            const bookNameMap = {
-                '创世记': 'Genesis', '出埃及记': 'Exodus', '利未记': 'Leviticus', '民数记': 'Numbers',
-                '申命记': 'Deuteronomy', '约书亚记': 'Joshua', '士师记': 'Judges', '路得记': 'Ruth',
-                '撒母耳记上': '1Samuel', '撒母耳记下': '2Samuel', '列王纪上': '1Kings', '列王纪下': '2Kings',
-                '历代志上': '1Chronicles', '历代志下': '2Chronicles', '以斯拉记': 'Ezra', '尼希米记': 'Nehemiah',
-                '以斯帖记': 'Esther', '约伯记': 'Job', '诗篇': 'Psalms', '箴言': 'Proverbs',
-                '传道书': 'Ecclesiastes', '雅歌': 'SongofSolomon', '以赛亚书': 'Isaiah', '耶利米书': 'Jeremiah',
-                '耶利米哀歌': 'Lamentations', '以西结书': 'Ezekiel', '但以理书': 'Daniel', '何西阿书': 'Hosea',
-                '约珥书': 'Joel', '阿摩司书': 'Amos', '俄巴底亚书': 'Obadiah', '约拿书': 'Jonah',
-                '弥迦书': 'Micah', '那鸿书': 'Nahum', '哈巴谷书': 'Habakkuk', '西番雅书': 'Zephaniah',
-                '哈该书': 'Haggai', '撒迦利亚书': 'Zechariah', '玛拉基书': 'Malachi',
-                '马太福音': 'Matthew', '马可福音': 'Mark', '路加福音': 'Luke', '约翰福音': 'John',
-                '使徒行传': 'Acts', '罗马书': 'Romans', '哥林多前书': '1Corinthians', '哥林多后书': '2Corinthians',
-                '加拉太书': 'Galatians', '以弗所书': 'Ephesians', '腓立比书': 'Philippians', '歌罗西书': 'Colossians',
-                '帖撒罗尼迦前书': '1Thessalonians', '帖撒罗尼迦后书': '2Thessalonians', '提摩太前书': '1Timothy', '提摩太后书': '2Timothy',
-                '提多书': 'Titus', '腓利门书': 'Philemon', '希伯来书': 'Hebrews', '雅各书': 'James',
-                '彼得前书': '1Peter', '彼得后书': '2Peter', '约翰一书': '1John', '约翰二书': '2John',
-                '约翰三书': '3John', '犹大书': 'Jude', '启示录': 'Revelation'
-            };
-
-            // 常用版本列表
-            const commonVersions = {
-                'CSBS': '中文标准译本（简体）',
-                'CSBT': '中文标准译本（繁体）',
-                'CUV': '和合本',
-                'CUVS': '和合本（简体）',
-                'NIV': '新国际版（英文）',
-                'KJV': '钦定版（英文）',
-                'ESV': '英文标准版',
-                'NLT': '新普及译本（英文）'
-            };
-
-            // 生成URL的函数
-            function generateUrl() {
-                const book = bookInput.value.trim();
-                const chapter = chapterInput.value.trim();
-                const version = versionInput.value.trim();
-                
-                if (!book) {
-                    showModal('请输入书名');
-                    return;
-                }
-                
-                if (!chapter) {
-                    showModal('请输入章数');
-                    return;
-                }
-                
-                if (!version) {
-                    showModal('请输入版本号');
-                    return;
-                }
-                
-                // 尝试查找书名映射
-                let bookCode = bookNameMap[book] || book;
-                
-                // 构建URL
-                const url = `https://www.biblegateway.com/passage/?search=${encodeURIComponent(book)}+${chapter}&version=${version}`;
-                
-                // 设置URL输入框的值
-                urlInput.value = url;
-                
-                // 可选：自动点击加载按钮
-                // loadButton.click();
-            }
-
-            // 添加事件监听器
-            generateUrlButton.addEventListener('click', generateUrl);
-
-            // 支持按Enter键快速操作
-            bookInput.addEventListener('keypress', function(event) {
-                if (event.key === 'Enter') {
-                    chapterInput.focus();
-                }
-            });
-
-            chapterInput.addEventListener('keypress', function(event) {
-                if (event.key === 'Enter') {
-                    versionInput.focus();
-                }
-            });
-
-            versionInput.addEventListener('keypress', function(event) {
-                if (event.key === 'Enter') {
-                    generateUrl();
-                }
-            });
-
-            // 添加版本选择下拉菜单功能
-            versionInput.addEventListener('focus', function() {
-                // 创建版本列表
-                const versionList = document.createElement('div');
-                versionList.className = 'version-list';
-                versionList.id = 'versionList';
-                
-                // 添加常用版本
-                for (const [code, name] of Object.entries(commonVersions)) {
-                    const item = document.createElement('div');
-                    item.className = 'version-item';
-                    item.textContent = `${code} - ${name}`;
-                    item.addEventListener('click', function() {
-                        versionInput.value = code;
-                        document.body.removeChild(versionList);
-                    });
-                    versionList.appendChild(item);
-                }
-                
-                // 定位和显示版本列表
-                const rect = this.getBoundingClientRect();
-                versionList.style.position = 'absolute';
-                versionList.style.top = `${rect.bottom}px`;
-                versionList.style.left = `${rect.left}px`;
-                versionList.style.width = `${Math.max(200, rect.width)}px`;
-                versionList.style.maxHeight = '200px';
-                versionList.style.overflowY = 'auto';
-                versionList.style.backgroundColor = 'white';
-                versionList.style.border = '1px solid #ddd';
-                versionList.style.borderRadius = '4px';
-                versionList.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
-                versionList.style.zIndex = '1000';
-                
-                // 添加到文档
-                document.body.appendChild(versionList);
-                
-                // 点击其他地方关闭列表
-                document.addEventListener('click', function closeList(e) {
-                    if (e.target !== versionInput && e.target !== versionList) {
-                        if (document.body.contains(versionList)) {
-                            document.body.removeChild(versionList);
-                        }
-                        document.removeEventListener('click', closeList);
-                    }
-                });
-            });
-
-            // 显示悬浮框
-            function showModal(message) {
-                modalMessage.textContent = message;
-                modal.style.display = 'flex';
-            }
-
-            // 关闭悬浮框
-            closeBtn.onclick = function() {
-                modal.style.display = 'none';
-            }
-
-            // 点击悬浮框外部关闭
-            window.onclick = function(event) {
-                if (event.target === modal) {
-                    modal.style.display = 'none';
-                }
-            }
-
-            // 显示控制面板在屏幕中央
-            function showPanelInCenter() {
-                // 计算屏幕中心位置
-                const viewportWidth = window.innerWidth;
-                const viewportHeight = window.innerHeight;
-                const panelWidth = 180; // 更新控制面板宽度
-                const panelHeight = 250; // 更新估计的控制面板高度
-                
-                const left = (viewportWidth - panelWidth) / 2;
-                const top = (viewportHeight - panelHeight) / 2;
-                
-                // 设置面板位置
-                controlPanel.style.left = `${left}px`;
-                controlPanel.style.top = `${top}px`;
-                controlPanel.style.display = 'block';
-                
-                // 更新按钮文本
-                showPanelBtn.textContent = '隐藏控制面板';
-            }
+            console.log('DOM加载完成，初始化全屏功能');
             
-            // 隐藏控制面板
-            function hidePanel() {
-                controlPanel.style.display = 'none';
-                showPanelBtn.textContent = '显示控制面板';
-            }
-            
-            // 切换控制面板显示/隐藏
-            showPanelBtn.addEventListener('click', function() {
-                if (controlPanel.style.display === 'none') {
-                    showPanelInCenter();
-                } else {
-                    hidePanel();
-                }
-                saveSettings();
-            });
-
-            // 保存设置到 localStorage
-            function saveSettings() {
-                const settings = {
-                    fontSize: fontSizeSlider.value,
-                    letterSpacing: letterSpacingSlider.value,
-                    lineHeight: lineHeightSlider.value,
-                    bgColor: bgColorPicker.value,
-                    panelCollapsed: panelContent.classList.contains('collapsed'),
-                    panelPosition: {
-                        left: controlPanel.style.left,
-                        top: controlPanel.style.top
-                    },
-                    panelVisible: controlPanel.style.display === 'block'
-                };
-                localStorage.setItem('readerSettings', JSON.stringify(settings));
-            }
-
-            // 从 localStorage 加载设置
-            function loadSettings() {
-                const savedSettings = localStorage.getItem('readerSettings');
-                if (savedSettings) {
-                    const settings = JSON.parse(savedSettings);
-                    
-                    // 应用字体设置
-                    fontSizeSlider.value = settings.fontSize;
-                    fontSizeInput.value = settings.fontSize;
-                    letterSpacingSlider.value = settings.letterSpacing;
-                    letterSpacingInput.value = settings.letterSpacing;
-                    lineHeightSlider.value = settings.lineHeight;
-                    lineHeightInput.value = settings.lineHeight;
-                    
-                    // 应用背景颜色设置
-                    if (settings.bgColor) {
-                        bgColorPicker.value = settings.bgColor;
-                        bgColorInput.value = settings.bgColor;
-                        applyBackgroundColor(settings.bgColor);
-                    } else {
-                        // 使用默认颜色
-                        applyBackgroundColor('#F2F0E9');
-                    }
-                    
-                    // 应用面板折叠状态
-                    if (settings.panelCollapsed) {
-                        panelContent.classList.add('collapsed');
-                        togglePanelBtn.textContent = '▼ 控制面板';
-                    } else {
-                        panelContent.classList.remove('collapsed');
-                        togglePanelBtn.textContent = '▲ 控制面板';
-                    }
-                    
-                    // 应用面板可见性
-                    if (settings.panelVisible) {
-                        controlPanel.style.display = 'block';
-                        showPanelBtn.textContent = '隐藏控制面板';
-                    } else {
-                        controlPanel.style.display = 'none';
-                        showPanelBtn.textContent = '显示控制面板';
-                    }
-                    
-                    // 应用面板位置
-                    if (settings.panelPosition && settings.panelPosition.left && settings.panelPosition.top) {
-                        // 检查位置是否在可视区域内
-                        const viewportWidth = window.innerWidth;
-                        const viewportHeight = window.innerHeight;
-                        
-                        let left = parseInt(settings.panelPosition.left);
-                        let top = parseInt(settings.panelPosition.top);
-                        
-                        // 确保面板不会完全超出屏幕
-                        if (left < 0) left = 0;
-                        if (top < 0) top = 0;
-                        if (left > viewportWidth - 50) left = viewportWidth - 50;
-                        if (top > viewportHeight - 50) top = viewportHeight - 50;
-                        
-                        controlPanel.style.left = `${left}px`;
-                        controlPanel.style.top = `${top}px`;
-                    } else if (settings.panelVisible) {
-                        // 如果面板可见但没有位置信息，显示在中央
-                        showPanelInCenter();
-                    }
-                    
-                    // 立即应用样式
-                    updateStyles();
-                } else {
-                    // 如果没有保存的设置，应用默认背景颜色
-                    applyBackgroundColor('#F2F0E9');
-                }
-            }
-
-            // 更新样式
-            function updateStyles() {
-                contentDisplay.style.fontSize = `${fontSizeSlider.value}px`;
-                contentDisplay.style.letterSpacing = `${letterSpacingSlider.value}px`;
-                contentDisplay.style.lineHeight = `${lineHeightSlider.value}em`;
-            }
-
-            // 同步滑块和输入框的值
-            fontSizeSlider.addEventListener('input', function() {
-                fontSizeInput.value = this.value;
-                updateStyles();
-                saveSettings();
-            });
-
-            fontSizeInput.addEventListener('input', function() {
-                fontSizeSlider.value = this.value;
-                updateStyles();
-                saveSettings();
-            });
-
-            letterSpacingSlider.addEventListener('input', function() {
-                letterSpacingInput.value = this.value;
-                updateStyles();
-                saveSettings();
-            });
-
-            letterSpacingInput.addEventListener('input', function() {
-                letterSpacingSlider.value = this.value;
-                updateStyles();
-                saveSettings();
-            });
-
-            lineHeightSlider.addEventListener('input', function() {
-                lineHeightInput.value = this.value;
-                updateStyles();
-                saveSettings();
-            });
-
-            lineHeightInput.addEventListener('input', function() {
-                lineHeightSlider.value = this.value;
-                updateStyles();
-                saveSettings();
-            });
-
-            // 控制面板展开/收缩
-            togglePanelBtn.addEventListener('click', function() {
-                panelContent.classList.toggle('collapsed');
-                this.textContent = panelContent.classList.contains('collapsed') ? '▼ 控制面板' : '▲ 控制面板';
-                saveSettings();
-            });
-
-            // 控制面板拖拽功能
-            const controlPanel = document.querySelector('.control-panel');
-            const dragHandle = document.getElementById('dragHandle');
-            let isDragging = false;
-            let offsetX, offsetY;
-
-            // 处理开始拖拽
-            function startDrag(clientX, clientY) {
-                isDragging = true;
-                offsetX = clientX - controlPanel.offsetLeft;
-                offsetY = clientY - controlPanel.offsetTop;
-            }
-
-            // 处理拖拽移动
-            function moveDrag(clientX, clientY) {
-                if (isDragging) {
-                    controlPanel.style.left = `${clientX - offsetX}px`;
-                    controlPanel.style.top = `${clientY - offsetY}px`;
-                }
-            }
-
-            // 处理结束拖拽
-            function endDrag() {
-                if (isDragging) {
-                    saveSettings(); // 保存面板位置
-                }
-                isDragging = false;
-            }
-
-            // PC端鼠标事件
-            dragHandle.addEventListener('mousedown', function(e) {
-                startDrag(e.clientX, e.clientY);
-                e.preventDefault(); // 防止文本选择
-            });
-
-            document.addEventListener('mousemove', function(e) {
-                moveDrag(e.clientX, e.clientY);
-            });
-
-            document.addEventListener('mouseup', endDrag);
-
-            // 移动端触摸事件
-            dragHandle.addEventListener('touchstart', function(e) {
-                const touch = e.touches[0];
-                startDrag(touch.clientX, touch.clientY);
-                e.preventDefault(); // 防止页面滚动
-            });
-
-            document.addEventListener('touchmove', function(e) {
-                if (isDragging) {
-                    const touch = e.touches[0];
-                    moveDrag(touch.clientX, touch.clientY);
-                    e.preventDefault(); // 防止页面滚动
-                }
-            });
-
-            document.addEventListener('touchend', endDrag);
-
-            // 加载章节内容
-            loadButton.addEventListener('click', function() {
-                const bibleUrl = urlInput.value.trim();
-                
-                // 验证输入
-                if (!bibleUrl) {
-                    showModal('请输入BibleGateway网址');
-                    return;
-                }
-                
-                // 验证URL格式
-                if (!bibleUrl.includes('biblegateway.com')) {
-                    showModal('请输入有效的BibleGateway网址');
-                    return;
-                }
-                
-                // 创建一个表单并提交
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = '/';
-                
-                const urlField = document.createElement('input');
-                urlField.type = 'hidden';
-                urlField.name = 'url';
-                urlField.value = bibleUrl;
-                
-                form.appendChild(urlField);
-                document.body.appendChild(form);
-                form.submit();
-            });
-
-            // 页面加载时恢复设置
-            loadSettings();
-            
-            // 添加窗口大小变化监听，确保控制面板始终可见
-            window.addEventListener('resize', function() {
-                const viewportWidth = window.innerWidth;
-                const viewportHeight = window.innerHeight;
-                const panelRect = controlPanel.getBoundingClientRect();
-                
-                // 如果面板位置已被设置（不是默认位置）
-                if (controlPanel.style.left) {
-                    // 确保面板不会完全超出屏幕
-                    if (panelRect.left > viewportWidth - 50) {
-                        controlPanel.style.left = `${viewportWidth - 50}px`;
-                    }
-                    if (panelRect.top > viewportHeight - 50) {
-                        controlPanel.style.top = `${viewportHeight - 50}px`;
-                    }
-                }
-            });
-
-            // 全屏显示功能
+            // 获取全屏相关元素
             const fullscreenBtn = document.getElementById('fullscreenBtn');
-            const fullscreenContainer = document.querySelector('.fullscreen-container');
+            const closeFullscreenBtn = document.getElementById('closeFullscreenBtn');
+            const fullscreenModal = document.getElementById('fullscreenModal');
+            const fullscreenContent = document.getElementById('fullscreenContent');
+            const contentDisplay = document.getElementById('contentDisplay');
             
+            // 检查元素是否存在
+            if (!fullscreenBtn) {
+                console.error('全屏按钮不存在');
+                return;
+            }
+            
+            if (!fullscreenModal || !closeFullscreenBtn || !fullscreenContent) {
+                console.error('全屏模态框元素不存在');
+                return;
+            }
+            
+            if (!contentDisplay) {
+                console.error('内容显示区域不存在');
+                return;
+            }
+            
+            console.log('所有必要元素都存在');
+            
+            // 进入全屏模式
             fullscreenBtn.addEventListener('click', function() {
-                const contentDisplay = document.getElementById('contentDisplay');
+                console.log('点击全屏按钮');
                 
-                // 检查是否支持全屏API
-                if (!document.fullscreenEnabled && 
-                    !document.webkitFullscreenEnabled && 
-                    !document.mozFullScreenEnabled && 
-                    !document.msFullscreenEnabled) {
-                    
-                    alert('您的浏览器不支持全屏功能');
-                    return;
-                }
+                // 复制内容到全屏容器
+                fullscreenContent.innerHTML = contentDisplay.innerHTML;
                 
-                try {
-                    // 尝试进入全屏模式（兼容不同浏览器）
-                    if (contentDisplay.requestFullscreen) {
-                        contentDisplay.requestFullscreen();
-                    } else if (contentDisplay.webkitRequestFullscreen) { /* Safari */
-                        contentDisplay.webkitRequestFullscreen();
-                    } else if (contentDisplay.msRequestFullscreen) { /* IE11 */
-                        contentDisplay.msRequestFullscreen();
-                    } else if (contentDisplay.mozRequestFullScreen) { /* Firefox */
-                        contentDisplay.mozRequestFullScreen();
-                    } else {
-                        alert('无法进入全屏模式');
-                    }
-                } catch (error) {
-                    console.error('全屏请求失败:', error);
-                    alert('全屏请求失败: ' + error.message);
-                }
+                // 显示全屏模态框
+                fullscreenModal.style.display = 'block';
+                
+                // 禁止body滚动
+                document.body.classList.add('fullscreen-mode');
+                
+                console.log('全屏模态框已显示');
             });
             
-            // 监听全屏变化事件
-            document.addEventListener('fullscreenchange', handleFullscreenChange);
-            document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
-            document.addEventListener('mozfullscreenchange', handleFullscreenChange);
-            document.addEventListener('MSFullscreenChange', handleFullscreenChange);
-
-            // 处理全屏状态变化
-            function handleFullscreenChange() {
-                const contentDisplay = document.getElementById('contentDisplay');
-                const fullscreenBtn = document.getElementById('fullscreenBtn');
+            // 退出全屏模式
+            closeFullscreenBtn.addEventListener('click', function() {
+                console.log('点击退出全屏按钮');
                 
-                // 检查是否处于全屏状态
-                if (document.fullscreenElement || 
-                    document.webkitFullscreenElement || 
-                    document.mozFullScreenElement || 
-                    document.msFullscreenElement) {
-                    
-                    // 已进入全屏
-                    fullscreenBtn.textContent = '退出全屏';
-                    contentDisplay.classList.add('fullscreen-active');
-                } else {
-                    // 已退出全屏
-                    fullscreenBtn.textContent = '全屏显示';
-                    contentDisplay.classList.remove('fullscreen-active');
-                }
-            }
-
-            // 添加退出全屏的快捷键（ESC键）
+                // 隐藏全屏模态框
+                fullscreenModal.style.display = 'none';
+                
+                // 恢复body滚动
+                document.body.classList.remove('fullscreen-mode');
+                
+                console.log('全屏模态框已隐藏');
+            });
+            
+            // 添加ESC键退出全屏
             document.addEventListener('keydown', function(event) {
-                if (event.key === 'Escape' && (
-                    document.fullscreenElement || 
-                    document.webkitFullscreenElement || 
-                    document.mozFullScreenElement || 
-                    document.msFullscreenElement
-                )) {
-                    // 已经处于全屏状态，按ESC退出
-                    if (document.exitFullscreen) {
-                        document.exitFullscreen();
-                    } else if (document.webkitExitFullscreen) {
-                        document.webkitExitFullscreen();
-                    } else if (document.mozCancelFullScreen) {
-                        document.mozCancelFullScreen();
-                    } else if (document.msExitFullscreen) {
-                        document.msExitFullscreen();
-                    }
-                }
-            });
-
-            function applyBackgroundColor(color) {
-                document.body.style.backgroundColor = color;
-            }
-
-            // 颜色选择器事件监听
-            bgColorPicker.addEventListener('input', function() {
-                const color = this.value;
-                bgColorInput.value = color;
-                applyBackgroundColor(color);
-                saveSettings();
-            });
-            
-            // 颜色输入框事件监听
-            bgColorInput.addEventListener('input', function() {
-                let color = this.value;
-                // 确保颜色值以#开头
-                if (!color.startsWith('#')) {
-                    color = '#' + color;
-                }
-                
-                // 验证颜色格式
-                const colorRegex = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
-                if (colorRegex.test(color)) {
-                    bgColorPicker.value = color;
-                    applyBackgroundColor(color);
-                    saveSettings();
+                if (event.key === 'Escape' && fullscreenModal.style.display === 'block') {
+                    console.log('按下ESC键，退出全屏');
+                    closeFullscreenBtn.click();
                 }
             });
             
-            // 颜色输入框失去焦点时验证
-            bgColorInput.addEventListener('blur', function() {
-                let color = this.value;
-                // 确保颜色值以#开头
-                if (!color.startsWith('#')) {
-                    color = '#' + color;
-                }
-                
-                // 验证颜色格式
-                const colorRegex = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
-                if (!colorRegex.test(color)) {
-                    // 如果格式不正确，恢复为上一个有效值
-                    this.value = bgColorPicker.value;
-                } else {
-                    // 标准化为6位十六进制
-                    if (color.length === 4) {
-                        const r = color[1];
-                        const g = color[2];
-                        const b = color[3];
-                        color = `#${r}${r}${g}${g}${b}${b}`;
-                        this.value = color;
-                    }
-                    bgColorPicker.value = color;
-                    applyBackgroundColor(color);
-                    saveSettings();
-                }
-            });
+            console.log('全屏功能初始化完成');
         });
+    </script>
+
+    <script>
+    // 等待DOM加载完成
+    document.addEventListener('DOMContentLoaded', function() {
+        // 获取全屏相关元素
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+        const fullscreenModal = document.getElementById('fullscreenModal');
+        const closeFullscreen = document.getElementById('closeFullscreen');
+        const modalContent = document.getElementById('modalContent');
+        const contentDisplay = document.getElementById('contentDisplay');
+        
+        // 检查元素是否存在
+        if (!fullscreenBtn) {
+            console.error('全屏按钮不存在');
+            return;
+        }
+        
+        if (!fullscreenModal || !closeFullscreen || !modalContent) {
+            console.error('模态框元素不存在，正在创建...');
+            
+            // 如果模态框不存在，动态创建它
+            const modal = document.createElement('div');
+            modal.id = 'fullscreenModal';
+            modal.className = 'modal';
+            
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <span id="closeFullscreen" class="close">&times;</span>
+                        <h2>全屏阅读</h2>
+                    </div>
+                    <div class="modal-body" id="modalContent"></div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // 重新获取元素
+            const fullscreenModal = document.getElementById('fullscreenModal');
+            const closeFullscreen = document.getElementById('closeFullscreen');
+            const modalContent = document.getElementById('modalContent');
+            
+            // 设置关闭事件
+            if (closeFullscreen) {
+                closeFullscreen.addEventListener('click', function() {
+                    fullscreenModal.style.display = 'none';
+                    document.body.style.overflow = '';
+                });
+            }
+        }
+        
+        // 打开全屏模态框
+        fullscreenBtn.addEventListener('click', function() {
+            console.log('打开全屏模态框');
+            
+            // 重新获取元素（以防它们是动态创建的）
+            const fullscreenModal = document.getElementById('fullscreenModal');
+            const modalContent = document.getElementById('modalContent');
+            
+            if (fullscreenModal && modalContent && contentDisplay) {
+                modalContent.innerHTML = contentDisplay.innerHTML;
+                fullscreenModal.style.display = 'block';
+                document.body.style.overflow = 'hidden'; // 禁止背景滚动
+            } else {
+                console.error('无法打开全屏模式：元素不存在');
+            }
+        });
+        
+        // ESC键关闭全屏
+        document.addEventListener('keydown', function(event) {
+            const fullscreenModal = document.getElementById('fullscreenModal');
+            if (event.key === 'Escape' && fullscreenModal && fullscreenModal.style.display === 'block') {
+                fullscreenModal.style.display = 'none';
+                document.body.style.overflow = '';
+            }
+        });
+        
+        console.log('全屏功能初始化完成');
+    });
     </script>
 </body>
 </html>
