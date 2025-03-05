@@ -22,9 +22,9 @@ services:
               "--log-level", "debug",        # 改为 error/debug 级别
               "--access-logfile", "-",
               "--error-logfile", "-",
-                "--certfile", "/etc/ssl/certs/fullchain.pem",  # 添加 SSL 证书配置
+                  # "--certfile", "/etc/ssl/certs/fullchain.pem",  # 添加 SSL 证书配置
 
-                "--keyfile", "/etc/ssl/certs/privkey.pem",     # 添加 SSL 密钥配置
+                  # "--keyfile", "/etc/ssl/certs/privkey.pem",     # 添加 SSL 密钥配置
               "--bind", "0.0.0.0:5001",
               "--access-logformat", "%(h)s %(l)s %(u)s %(t)s '%(r)s' %(s)s %(b)s '%(f)s' '%(a)s'",  # 添加自定义日志格式
               "app:app"]
