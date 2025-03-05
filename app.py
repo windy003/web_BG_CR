@@ -1,5 +1,5 @@
 from flask import Flask, request, render_template
-import requests
+import requests , string
 from bs4 import BeautifulSoup
 import re
 import html
@@ -73,11 +73,19 @@ def index():
             chapter_text.append("<br><strong>脚注</strong><br>")
             footnote_items = footnotes_section.find_all('li')
             
-            for item in footnote_items:
-                clean_footnote_text = clean_text(item.get_text(separator=' '))
-                if clean_footnote_text:
-                    chapter_text.append(clean_footnote_text)
-        
+             # 创建小写字母列表
+            footnote_markers = list(string.ascii_lowercase)
+            for i, item in enumerate(footnote_items):
+                if i < len(footnote_markers):
+                    marker = footnote_markers[i]
+                    full_text = item.get_text(separator=' ', strip=True)
+                    # 确保脚注标记正确显示
+                    if not full_text.startswith(marker):
+                        full_text = f"{marker} {full_text}"
+                    chapter_text.append(full_text)
+
+
+
         # 正确连接列表元素
         formatted_content = "<br>".join(chapter_text)
         

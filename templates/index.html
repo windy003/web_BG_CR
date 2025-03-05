@@ -312,6 +312,7 @@
         }
         
         .fullscreen-content {
+            overflow-x: hidden;
             padding: 20px;
             line-height: 1.6;
             min-height: 100px; /* 设置最小高度 */
@@ -434,6 +435,7 @@
             background-color: #f9f9f9;
             z-index: 2000;
             overflow: auto;
+            overflow-x: hidden;
             padding: 0px;
             box-sizing: border-box;
         }
@@ -555,6 +557,7 @@
             background-color: white;
             z-index: 9999;
             overflow: auto;
+            overflow-x: hidden;
         }
 
         .fullscreen-header {
@@ -586,10 +589,7 @@
             line-height: 1.6;
         }
 
-        /* 当处于全屏模式时，隐藏滚动条 */
-        body.fullscreen-mode {
-            overflow: hidden;
-        }
+        
     </style>
 </head>
 <body>
@@ -675,152 +675,211 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM加载完成，初始化全屏功能');
+            // 获取控制面板相关元素
+            const showPanelBtn = document.getElementById('showPanelBtn');
+            const controlPanel = document.querySelector('.control-panel');
+            const togglePanel = document.getElementById('togglePanel');
+            const panelContent = document.querySelector('.panel-content');
+            const dragHandle = document.getElementById('dragHandle');
             
-            // 获取全屏相关元素
-            const fullscreenBtn = document.getElementById('fullscreenBtn');
-            const closeFullscreenBtn = document.getElementById('closeFullscreenBtn');
-            const fullscreenModal = document.getElementById('fullscreenModal');
-            const fullscreenContent = document.getElementById('fullscreenContent');
+            // 字体大小控制
+            const fontSizeSlider = document.getElementById('fontSize');
+            const fontSizeInput = document.getElementById('fontSizeInput');
             const contentDisplay = document.getElementById('contentDisplay');
             
-            // 检查元素是否存在
-            if (!fullscreenBtn) {
-                console.error('全屏按钮不存在');
-                return;
+            // 字间距控制
+            const letterSpacingSlider = document.getElementById('letterSpacing');
+            const letterSpacingInput = document.getElementById('letterSpacingInput');
+            
+            // 行间距控制
+            const lineHeightSlider = document.getElementById('lineHeight');
+            const lineHeightInput = document.getElementById('lineHeightInput');
+            
+            // 背景颜色控制
+            const bgColorPicker = document.getElementById('bgColorPicker');
+            const bgColorInput = document.getElementById('bgColorInput');
+            
+            // 全屏相关元素
+            const fullscreenBtn = document.getElementById('fullscreenBtn');
+            const fullscreenModal = document.getElementById('fullscreenModal');
+            const fullscreenContent = document.getElementById('fullscreenContent');
+            const closeFullscreenBtn = document.getElementById('closeFullscreenBtn');
+            
+            // 设置对象，用于保存所有设置
+            let settings = {
+                fontSize: '16',
+                letterSpacing: '1',
+                lineHeight: '1.5',
+                bgColor: '#F2F0E9'
+            };
+            
+            // 从localStorage加载设置
+            function loadSettings() {
+                const savedSettings = localStorage.getItem('bibleReaderSettings');
+                if (savedSettings) {
+                    settings = JSON.parse(savedSettings);
+                    
+                    // 应用设置到控件
+                    fontSizeSlider.value = settings.fontSize;
+                    fontSizeInput.value = settings.fontSize;
+                    letterSpacingSlider.value = settings.letterSpacing;
+                    letterSpacingInput.value = settings.letterSpacing;
+                    lineHeightSlider.value = settings.lineHeight;
+                    lineHeightInput.value = settings.lineHeight;
+                    bgColorPicker.value = settings.bgColor;
+                    bgColorInput.value = settings.bgColor;
+                    
+                    // 应用设置到内容显示区域
+                    applySettings(contentDisplay);
+                }
             }
             
-            if (!fullscreenModal || !closeFullscreenBtn || !fullscreenContent) {
-                console.error('全屏模态框元素不存在');
-                return;
+            // 保存设置到localStorage
+            function saveSettings() {
+                localStorage.setItem('bibleReaderSettings', JSON.stringify(settings));
             }
             
-            if (!contentDisplay) {
-                console.error('内容显示区域不存在');
-                return;
+            // 应用设置到指定元素
+            function applySettings(element) {
+                element.style.fontSize = settings.fontSize + 'px';
+                element.style.letterSpacing = settings.letterSpacing + 'px';
+                element.style.lineHeight = settings.lineHeight;
+                element.style.backgroundColor = settings.bgColor;
             }
             
-            console.log('所有必要元素都存在');
+            // 显示/隐藏控制面板
+            showPanelBtn.addEventListener('click', function() {
+                controlPanel.style.display = controlPanel.style.display === 'none' || controlPanel.style.display === '' ? 'block' : 'none';
+            });
             
-            // 进入全屏模式
-            fullscreenBtn.addEventListener('click', function() {
-                console.log('点击全屏按钮');
+            // 折叠/展开控制面板内容
+            togglePanel.addEventListener('click', function() {
+                panelContent.classList.toggle('collapsed');
+                togglePanel.textContent = panelContent.classList.contains('collapsed') ? '▼ 控制面板' : '▲ 控制面板';
+            });
+            
+            // 字体大小控制
+            fontSizeSlider.addEventListener('input', function() {
+                settings.fontSize = this.value;
+                fontSizeInput.value = settings.fontSize;
+                applySettings(contentDisplay);
+                saveSettings();
+            });
+            
+            fontSizeInput.addEventListener('input', function() {
+                settings.fontSize = this.value;
+                fontSizeSlider.value = settings.fontSize;
+                applySettings(contentDisplay);
+                saveSettings();
+            });
+            
+            // 字间距控制
+            letterSpacingSlider.addEventListener('input', function() {
+                settings.letterSpacing = this.value;
+                letterSpacingInput.value = settings.letterSpacing;
+                applySettings(contentDisplay);
+                saveSettings();
+            });
+            
+            letterSpacingInput.addEventListener('input', function() {
+                settings.letterSpacing = this.value;
+                letterSpacingSlider.value = settings.letterSpacing;
+                applySettings(contentDisplay);
+                saveSettings();
+            });
+            
+            // 行间距控制
+            lineHeightSlider.addEventListener('input', function() {
+                settings.lineHeight = this.value;
+                lineHeightInput.value = settings.lineHeight;
+                applySettings(contentDisplay);
+                saveSettings();
+            });
+            
+            lineHeightInput.addEventListener('input', function() {
+                settings.lineHeight = this.value;
+                lineHeightSlider.value = settings.lineHeight;
+                applySettings(contentDisplay);
+                saveSettings();
+            });
+            
+            // 背景颜色控制
+            bgColorPicker.addEventListener('input', function() {
+                settings.bgColor = this.value;
+                bgColorInput.value = settings.bgColor;
+                applySettings(contentDisplay);
+                saveSettings();
+            });
+            
+            bgColorInput.addEventListener('input', function() {
+                settings.bgColor = this.value;
+                bgColorPicker.value = settings.bgColor;
+                applySettings(contentDisplay);
+                saveSettings();
+            });
+            
+            // 拖动控制面板功能
+            let isDragging = false;
+            let offsetX, offsetY;
+            
+            dragHandle.addEventListener('mousedown', function(e) {
+                isDragging = true;
+                offsetX = e.clientX - controlPanel.getBoundingClientRect().left;
+                offsetY = e.clientY - controlPanel.getBoundingClientRect().top;
+            });
+            
+            document.addEventListener('mousemove', function(e) {
+                if (!isDragging) return;
                 
+                const x = e.clientX - offsetX;
+                const y = e.clientY - offsetY;
+                
+                controlPanel.style.left = x + 'px';
+                controlPanel.style.top = y + 'px';
+                controlPanel.style.right = 'auto'; // 取消右侧定位
+            });
+            
+            document.addEventListener('mouseup', function() {
+                isDragging = false;
+            });
+            
+            // 全屏模式
+            fullscreenBtn.addEventListener('click', function() {
                 // 复制内容到全屏容器
                 fullscreenContent.innerHTML = contentDisplay.innerHTML;
+                
+                // 应用相同的样式设置到全屏内容
+                applySettings(fullscreenContent);
                 
                 // 显示全屏模态框
                 fullscreenModal.style.display = 'block';
                 
                 // 禁止body滚动
                 document.body.classList.add('fullscreen-mode');
-                
-                console.log('全屏模态框已显示');
             });
             
             // 退出全屏模式
             closeFullscreenBtn.addEventListener('click', function() {
-                console.log('点击退出全屏按钮');
-                
                 // 隐藏全屏模态框
                 fullscreenModal.style.display = 'none';
                 
                 // 恢复body滚动
                 document.body.classList.remove('fullscreen-mode');
-                
-                console.log('全屏模态框已隐藏');
             });
             
             // 添加ESC键退出全屏
             document.addEventListener('keydown', function(event) {
                 if (event.key === 'Escape' && fullscreenModal.style.display === 'block') {
-                    console.log('按下ESC键，退出全屏');
                     closeFullscreenBtn.click();
                 }
             });
             
-            console.log('全屏功能初始化完成');
+            // 初始化控制面板状态
+            controlPanel.style.display = 'none'; // 默认隐藏控制面板
+            
+            // 加载保存的设置
+            loadSettings();
         });
-    </script>
-
-    <script>
-    // 等待DOM加载完成
-    document.addEventListener('DOMContentLoaded', function() {
-        // 获取全屏相关元素
-        const fullscreenBtn = document.getElementById('fullscreenBtn');
-        const fullscreenModal = document.getElementById('fullscreenModal');
-        const closeFullscreen = document.getElementById('closeFullscreen');
-        const modalContent = document.getElementById('modalContent');
-        const contentDisplay = document.getElementById('contentDisplay');
-        
-        // 检查元素是否存在
-        if (!fullscreenBtn) {
-            console.error('全屏按钮不存在');
-            return;
-        }
-        
-        if (!fullscreenModal || !closeFullscreen || !modalContent) {
-            console.error('模态框元素不存在，正在创建...');
-            
-            // 如果模态框不存在，动态创建它
-            const modal = document.createElement('div');
-            modal.id = 'fullscreenModal';
-            modal.className = 'modal';
-            
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <span id="closeFullscreen" class="close">&times;</span>
-                        <h2>全屏阅读</h2>
-                    </div>
-                    <div class="modal-body" id="modalContent"></div>
-                </div>
-            `;
-            
-            document.body.appendChild(modal);
-            
-            // 重新获取元素
-            const fullscreenModal = document.getElementById('fullscreenModal');
-            const closeFullscreen = document.getElementById('closeFullscreen');
-            const modalContent = document.getElementById('modalContent');
-            
-            // 设置关闭事件
-            if (closeFullscreen) {
-                closeFullscreen.addEventListener('click', function() {
-                    fullscreenModal.style.display = 'none';
-                    document.body.style.overflow = '';
-                });
-            }
-        }
-        
-        // 打开全屏模态框
-        fullscreenBtn.addEventListener('click', function() {
-            console.log('打开全屏模态框');
-            
-            // 重新获取元素（以防它们是动态创建的）
-            const fullscreenModal = document.getElementById('fullscreenModal');
-            const modalContent = document.getElementById('modalContent');
-            
-            if (fullscreenModal && modalContent && contentDisplay) {
-                modalContent.innerHTML = contentDisplay.innerHTML;
-                fullscreenModal.style.display = 'block';
-                document.body.style.overflow = 'hidden'; // 禁止背景滚动
-            } else {
-                console.error('无法打开全屏模式：元素不存在');
-            }
-        });
-        
-        // ESC键关闭全屏
-        document.addEventListener('keydown', function(event) {
-            const fullscreenModal = document.getElementById('fullscreenModal');
-            if (event.key === 'Escape' && fullscreenModal && fullscreenModal.style.display === 'block') {
-                fullscreenModal.style.display = 'none';
-                document.body.style.overflow = '';
-            }
-        });
-        
-        console.log('全屏功能初始化完成');
-    });
     </script>
 </body>
 </html>
