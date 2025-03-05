@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    image: windy007008/web_bg_cr:latest
+    ports:
+      - "5001:5001"
+    volumes:
+      - .:/app
+    environment:
+      FLASK_ENV: development
+    restart: always
+    user: "1000:1000"  # 使用宿主机的UID:GID
+    command: ["gunicorn", 
+              "--workers", "4",
+              "--timeout", "120",
+              "--keep-alive", "5",
+              "--max-requests", "1000",
+              "--max-requests-jitter", "50",
+              "--log-level", "debug",     # 开发环境使用 debug 级别
+              "--access-logfile", "-",
+              "--error-logfile", "-",
+              "--bind", "0.0.0.0:5001",
+              "app:app"]

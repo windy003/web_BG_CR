@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>圣经章节阅读器</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='180x180.png') }}"> 
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .input-container {
+            display: flex;
+            margin: 20px 0;
+            justify-content: center;
+        }
+        input {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-right: 10px;
+            width: 60px;
+            text-align: center;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        pre {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            font-family: 'Courier New', Courier, monospace;
+            line-height: 1.5;
+            max-height: 500px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 400px;
+            text-align: center;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close:hover {
+            color: black;
+        }
+        .chapter-info {
+            margin-bottom: 15px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        /* 控制面板样式 */
+        .control-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.7); /* 增加透明度 */
+            padding: 8px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            width: 180px; /* 减小宽度 */
+            z-index: 1000;
+            display: none; /* 默认隐藏 */
+            font-size: 14px; /* 减小字体大小 */
+        }
+
+        /* 控制面板按钮样式 */
+        .panel-toggle-btn {
+            margin-left: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        /* 移动端适配 */
+        @media (max-width: 768px) {
+            .control-panel {
+                width: 70%; /* 减小宽度比例 */
+                max-width: 220px;
+                top: 10px;
+                right: 10px;
+            }
+            pre {
+                width: 100vw; /* 占满整个视口宽度 */
+                max-width: 100vw; /* 确保不会超出视口 */
+                margin-left: calc(-50vw + 50%); /* 使元素居中对齐，并延伸到屏幕边缘 */
+                padding: 10px; /* 添加适当的内边距 */
+                box-sizing: border-box; /* 确保内边距不会增加总宽度 */
+                white-space: pre-wrap; /* 保持换行并允许文本自动换行 */
+                overflow-x: hidden; /* 隐藏水平滚动条 */
+                position: relative; /* 确保定位正确 */
+                left: 0; /* 确保左对齐 */
+            }
+            
+            /* 如果需要，可以调整 pre 的父容器 */
+            body, html, .container, .content-area {
+                padding: 0;
+                margin: 0;
+                width: 100%;
+                overflow-x: hidden; /* 防止水平滚动 */
+            }
+        }
+
+        /* 拖动手柄样式 */
+        .drag-handle {
+            height: 16px; /* 减小高度 */
+            background-color: rgba(224, 224, 224, 0.7); /* 增加透明度 */
+            border-radius: 4px;
+            margin-bottom: 8px;
+            cursor: move;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .drag-handle::before {
+            content: "⋮⋮";
+            color: #666;
+            font-size: 14px;
+            letter-spacing: 2px;
+        }
+
+        .control-panel label {
+            display: block;
+            margin: 4px 0;
+            font-size: 13px; /* 减小字体大小 */
+            color: #333;
+        }
+
+        /* 添加滑动条和数值输入框的容器样式 */
+        .slider-container {
+            display: flex;
+            align-items: center;
+            margin: 4px 0;
+        }
+
+        .slider-container input[type="range"] {
+            flex: 1;
+            margin-right: 8px;
+        }
+
+        .slider-container input[type="number"] {
+            width: 45px;
+            padding: 3px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        /* 修改原有的输入框样式 */
+        .control-panel input[type="range"] {
+            margin: 0;
+        }
+
+        .control-panel input[type="number"] {
+            margin: 0;
+            padding: 3px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .toggle-btn {
+            width: 100%;
+            padding: 4px;
+            margin-bottom: 8px;
+            background-color: rgba(76, 175, 80, 0.8); /* 增加透明度 */
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px; /* 减小字体大小 */
+        }
+        .panel-content {
+            display: block;
+        }
+        .panel-content.collapsed {
+            display: none;
+        }
+        /* 全屏按钮样式 */
+        .fullscreen-container {
+            position: relative;
+        }
+        
+        .fullscreen-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: rgba(76, 175, 80, 0.8);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 14px;
+            z-index: 100;
+        }
+        
+        .fullscreen-btn:hover {
+            background-color: rgba(69, 160, 73, 0.9);
+        }
+        
+        /* 全屏模式样式 */
+        .fullscreen-mode {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #f9f9f9;
+            z-index: 2000;
+            overflow: auto;
+            padding: 0px;
+            box-sizing: border-box;
+        }
+        
+        .fullscreen-mode .fullscreen-btn {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+        }
+
+        /* 颜色选择器容器样式 */
+        .color-container {
+            display: flex;
+            align-items: center;
+            margin: 4px 0;
+        }
+        
+        .color-container input[type="color"] {
+            width: 30px;
+            height: 30px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 0;
+            margin-right: 8px;
+            cursor: pointer;
+        }
+        
+        .color-container input[type="text"] {
+            flex: 1;
+            padding: 3px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>圣经章节阅读器</h1>
+        <div class="input-container">
+            <input type="text" id="urlInput" placeholder="输入BibleGateway网址" style="width: 300px;">
+            <button id="loadButton">加载内容</button>
+            <button id="showPanelBtn" class="panel-toggle-btn">显示控制面板</button>
+        </div>
+        <div class="chapter-info" id="chapterInfo">
+            {% if title %}
+            <h2>{{ title }}</h2>
+            {% endif %}
+        </div>
+        <div class="fullscreen-container">
+            <button id="fullscreenBtn" class="fullscreen-btn">全屏显示</button>
+            <pre id="contentDisplay">{% if content %}{{ content | safe }}{% endif %}</pre>
+        </div>
+    </div>
+
+    <!-- 控制面板 -->
+    <div class="control-panel">
+        <div class="drag-handle" id="dragHandle"></div>
+        <button id="togglePanel" class="toggle-btn">▲ 控制面板</button>
+        <div class="panel-content">
+            <label for="fontSize">字体大小 (px):</label>
+            <div class="slider-container">
+                <input type="range" id="fontSize" min="12" max="40" value="16">
+                <input type="number" id="fontSizeInput" min="12" max="40" value="16">
+            </div>
+
+            <label for="letterSpacing">字间距 (px):</label>
+            <div class="slider-container">
+                <input type="range" id="letterSpacing" min="0" max="20" value="1" step="0.1">
+                <input type="number" id="letterSpacingInput" min="0" max="20" value="1" step="0.1">
+            </div>
+
+            <label for="lineHeight">行间距 (em):</label>
+            <div class="slider-container">
+                <input type="range" id="lineHeight" min="1" max="2.5" value="1.5" step="0.1">
+                <input type="number" id="lineHeightInput" min="1" max="2.5" value="1.5" step="0.1">
+            </div>
+            
+            <label for="bgColor">背景颜色:</label>
+            <div class="color-container">
+                <input type="color" id="bgColorPicker" value="#F2F0E9">
+                <input type="text" id="bgColorInput" value="#F2F0E9" maxlength="7">
+            </div>
+        </div>
+    </div>
+
+    <!-- 悬浮提示框 -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <p id="modalMessage"></p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlInput = document.getElementById('urlInput');
+            const loadButton = document.getElementById('loadButton');
+            const contentDisplay = document.getElementById('contentDisplay');
+            const chapterInfo = document.getElementById('chapterInfo');
+            const modal = document.getElementById('modal');
+            const modalMessage = document.getElementById('modalMessage');
+            const closeBtn = document.querySelector('.close');
+
+            // 控制面板元素
+            const fontSizeSlider = document.getElementById('fontSize');
+            const fontSizeInput = document.getElementById('fontSizeInput');
+            const letterSpacingSlider = document.getElementById('letterSpacing');
+            const letterSpacingInput = document.getElementById('letterSpacingInput');
+            const lineHeightSlider = document.getElementById('lineHeight');
+            const lineHeightInput = document.getElementById('lineHeightInput');
+            const panelContent = document.querySelector('.panel-content');
+            const togglePanelBtn = document.getElementById('togglePanel');
+            const showPanelBtn = document.getElementById('showPanelBtn');
+
+            // 背景颜色控制元素
+            const bgColorPicker = document.getElementById('bgColorPicker');
+            const bgColorInput = document.getElementById('bgColorInput');
+
+            // 显示悬浮框
+            function showModal(message) {
+                modalMessage.textContent = message;
+                modal.style.display = 'flex';
+            }
+
+            // 关闭悬浮框
+            closeBtn.onclick = function() {
+                modal.style.display = 'none';
+            }
+
+            // 点击悬浮框外部关闭
+            window.onclick = function(event) {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            }
+
+            // 显示控制面板在屏幕中央
+            function showPanelInCenter() {
+                // 计算屏幕中心位置
+                const viewportWidth = window.innerWidth;
+                const viewportHeight = window.innerHeight;
+                const panelWidth = 180; // 更新控制面板宽度
+                const panelHeight = 250; // 更新估计的控制面板高度
+                
+                const left = (viewportWidth - panelWidth) / 2;
+                const top = (viewportHeight - panelHeight) / 2;
+                
+                // 设置面板位置
+                controlPanel.style.left = `${left}px`;
+                controlPanel.style.top = `${top}px`;
+                controlPanel.style.display = 'block';
+                
+                // 更新按钮文本
+                showPanelBtn.textContent = '隐藏控制面板';
+            }
+            
+            // 隐藏控制面板
+            function hidePanel() {
+                controlPanel.style.display = 'none';
+                showPanelBtn.textContent = '显示控制面板';
+            }
+            
+            // 切换控制面板显示/隐藏
+            showPanelBtn.addEventListener('click', function() {
+                if (controlPanel.style.display === 'none') {
+                    showPanelInCenter();
+                } else {
+                    hidePanel();
+                }
+                saveSettings();
+            });
+
+            // 保存设置到 localStorage
+            function saveSettings() {
+                const settings = {
+                    fontSize: fontSizeSlider.value,
+                    letterSpacing: letterSpacingSlider.value,
+                    lineHeight: lineHeightSlider.value,
+                    bgColor: bgColorPicker.value,
+                    panelCollapsed: panelContent.classList.contains('collapsed'),
+                    panelPosition: {
+                        left: controlPanel.style.left,
+                        top: controlPanel.style.top
+                    },
+                    panelVisible: controlPanel.style.display === 'block'
+                };
+                localStorage.setItem('readerSettings', JSON.stringify(settings));
+            }
+
+            // 从 localStorage 加载设置
+            function loadSettings() {
+                const savedSettings = localStorage.getItem('readerSettings');
+                if (savedSettings) {
+                    const settings = JSON.parse(savedSettings);
+                    
+                    // 应用字体设置
+                    fontSizeSlider.value = settings.fontSize;
+                    fontSizeInput.value = settings.fontSize;
+                    letterSpacingSlider.value = settings.letterSpacing;
+                    letterSpacingInput.value = settings.letterSpacing;
+                    lineHeightSlider.value = settings.lineHeight;
+                    lineHeightInput.value = settings.lineHeight;
+                    
+                    // 应用背景颜色设置
+                    if (settings.bgColor) {
+                        bgColorPicker.value = settings.bgColor;
+                        bgColorInput.value = settings.bgColor;
+                        applyBackgroundColor(settings.bgColor);
+                    } else {
+                        // 使用默认颜色
+                        applyBackgroundColor('#F2F0E9');
+                    }
+                    
+                    // 应用面板折叠状态
+                    if (settings.panelCollapsed) {
+                        panelContent.classList.add('collapsed');
+                        togglePanelBtn.textContent = '▼ 控制面板';
+                    } else {
+                        panelContent.classList.remove('collapsed');
+                        togglePanelBtn.textContent = '▲ 控制面板';
+                    }
+                    
+                    // 应用面板可见性
+                    if (settings.panelVisible) {
+                        controlPanel.style.display = 'block';
+                        showPanelBtn.textContent = '隐藏控制面板';
+                    } else {
+                        controlPanel.style.display = 'none';
+                        showPanelBtn.textContent = '显示控制面板';
+                    }
+                    
+                    // 应用面板位置
+                    if (settings.panelPosition && settings.panelPosition.left && settings.panelPosition.top) {
+                        // 检查位置是否在可视区域内
+                        const viewportWidth = window.innerWidth;
+                        const viewportHeight = window.innerHeight;
+                        
+                        let left = parseInt(settings.panelPosition.left);
+                        let top = parseInt(settings.panelPosition.top);
+                        
+                        // 确保面板不会完全超出屏幕
+                        if (left < 0) left = 0;
+                        if (top < 0) top = 0;
+                        if (left > viewportWidth - 50) left = viewportWidth - 50;
+                        if (top > viewportHeight - 50) top = viewportHeight - 50;
+                        
+                        controlPanel.style.left = `${left}px`;
+                        controlPanel.style.top = `${top}px`;
+                    } else if (settings.panelVisible) {
+                        // 如果面板可见但没有位置信息，显示在中央
+                        showPanelInCenter();
+                    }
+                    
+                    // 立即应用样式
+                    updateStyles();
+                } else {
+                    // 如果没有保存的设置，应用默认背景颜色
+                    applyBackgroundColor('#F2F0E9');
+                }
+            }
+
+            // 更新样式
+            function updateStyles() {
+                contentDisplay.style.fontSize = `${fontSizeSlider.value}px`;
+                contentDisplay.style.letterSpacing = `${letterSpacingSlider.value}px`;
+                contentDisplay.style.lineHeight = `${lineHeightSlider.value}em`;
+            }
+
+            // 同步滑块和输入框的值
+            fontSizeSlider.addEventListener('input', function() {
+                fontSizeInput.value = this.value;
+                updateStyles();
+                saveSettings();
+            });
+
+            fontSizeInput.addEventListener('input', function() {
+                fontSizeSlider.value = this.value;
+                updateStyles();
+                saveSettings();
+            });
+
+            letterSpacingSlider.addEventListener('input', function() {
+                letterSpacingInput.value = this.value;
+                updateStyles();
+                saveSettings();
+            });
+
+            letterSpacingInput.addEventListener('input', function() {
+                letterSpacingSlider.value = this.value;
+                updateStyles();
+                saveSettings();
+            });
+
+            lineHeightSlider.addEventListener('input', function() {
+                lineHeightInput.value = this.value;
+                updateStyles();
+                saveSettings();
+            });
+
+            lineHeightInput.addEventListener('input', function() {
+                lineHeightSlider.value = this.value;
+                updateStyles();
+                saveSettings();
+            });
+
+            // 控制面板展开/收缩
+            togglePanelBtn.addEventListener('click', function() {
+                panelContent.classList.toggle('collapsed');
+                this.textContent = panelContent.classList.contains('collapsed') ? '▼ 控制面板' : '▲ 控制面板';
+                saveSettings();
+            });
+
+            // 控制面板拖拽功能
+            const controlPanel = document.querySelector('.control-panel');
+            const dragHandle = document.getElementById('dragHandle');
+            let isDragging = false;
+            let offsetX, offsetY;
+
+            // 处理开始拖拽
+            function startDrag(clientX, clientY) {
+                isDragging = true;
+                offsetX = clientX - controlPanel.offsetLeft;
+                offsetY = clientY - controlPanel.offsetTop;
+            }
+
+            // 处理拖拽移动
+            function moveDrag(clientX, clientY) {
+                if (isDragging) {
+                    controlPanel.style.left = `${clientX - offsetX}px`;
+                    controlPanel.style.top = `${clientY - offsetY}px`;
+                }
+            }
+
+            // 处理结束拖拽
+            function endDrag() {
+                if (isDragging) {
+                    saveSettings(); // 保存面板位置
+                }
+                isDragging = false;
+            }
+
+            // PC端鼠标事件
+            dragHandle.addEventListener('mousedown', function(e) {
+                startDrag(e.clientX, e.clientY);
+                e.preventDefault(); // 防止文本选择
+            });
+
+            document.addEventListener('mousemove', function(e) {
+                moveDrag(e.clientX, e.clientY);
+            });
+
+            document.addEventListener('mouseup', endDrag);
+
+            // 移动端触摸事件
+            dragHandle.addEventListener('touchstart', function(e) {
+                const touch = e.touches[0];
+                startDrag(touch.clientX, touch.clientY);
+                e.preventDefault(); // 防止页面滚动
+            });
+
+            document.addEventListener('touchmove', function(e) {
+                if (isDragging) {
+                    const touch = e.touches[0];
+                    moveDrag(touch.clientX, touch.clientY);
+                    e.preventDefault(); // 防止页面滚动
+                }
+            });
+
+            document.addEventListener('touchend', endDrag);
+
+            // 加载章节内容
+            loadButton.addEventListener('click', function() {
+                const bibleUrl = urlInput.value.trim();
+                
+                // 验证输入
+                if (!bibleUrl) {
+                    showModal('请输入BibleGateway网址');
+                    return;
+                }
+                
+                // 验证URL格式
+                if (!bibleUrl.includes('biblegateway.com')) {
+                    showModal('请输入有效的BibleGateway网址');
+                    return;
+                }
+                
+                // 创建一个表单并提交
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/';
+                
+                const urlField = document.createElement('input');
+                urlField.type = 'hidden';
+                urlField.name = 'url';
+                urlField.value = bibleUrl;
+                
+                form.appendChild(urlField);
+                document.body.appendChild(form);
+                form.submit();
+            });
+
+            // 支持按Enter键加载
+            urlInput.addEventListener('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    loadButton.click();
+                }
+            });
+
+            // 页面加载时恢复设置
+            loadSettings();
+            
+            // 添加窗口大小变化监听，确保控制面板始终可见
+            window.addEventListener('resize', function() {
+                const viewportWidth = window.innerWidth;
+                const viewportHeight = window.innerHeight;
+                const panelRect = controlPanel.getBoundingClientRect();
+                
+                // 如果面板位置已被设置（不是默认位置）
+                if (controlPanel.style.left) {
+                    // 确保面板不会完全超出屏幕
+                    if (panelRect.left > viewportWidth - 50) {
+                        controlPanel.style.left = `${viewportWidth - 50}px`;
+                    }
+                    if (panelRect.top > viewportHeight - 50) {
+                        controlPanel.style.top = `${viewportHeight - 50}px`;
+                    }
+                }
+            });
+
+            // 全屏显示功能
+            const fullscreenBtn = document.getElementById('fullscreenBtn');
+            const fullscreenContainer = document.querySelector('.fullscreen-container');
+            
+            fullscreenBtn.addEventListener('click', function() {
+                if (fullscreenContainer.classList.contains('fullscreen-mode')) {
+                    // 退出全屏
+                    fullscreenContainer.classList.remove('fullscreen-mode');
+                    fullscreenBtn.textContent = '全屏显示';
+                    // 恢复原始样式
+                    contentDisplay.style.maxHeight = '500px';
+                } else {
+                    // 进入全屏
+                    fullscreenContainer.classList.add('fullscreen-mode');
+                    fullscreenBtn.textContent = '退出全屏';
+                    // 移除高度限制
+                    contentDisplay.style.maxHeight = 'none';
+                    // 应用当前背景颜色到全屏模式
+                    fullscreenContainer.style.backgroundColor = bgColorPicker.value;
+                }
+            });
+            
+            // 支持按ESC键退出全屏
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && fullscreenContainer.classList.contains('fullscreen-mode')) {
+                    fullscreenContainer.classList.remove('fullscreen-mode');
+                    fullscreenBtn.textContent = '全屏显示';
+                    contentDisplay.style.maxHeight = '500px';
+                }
+            });
+
+            
+            function applyBackgroundColor(color) {
+                document.body.style.backgroundColor = color;
+            }
+
+            // 颜色选择器事件监听
+            bgColorPicker.addEventListener('input', function() {
+                const color = this.value;
+                bgColorInput.value = color;
+                applyBackgroundColor(color);
+                saveSettings();
+            });
+            
+            // 颜色输入框事件监听
+            bgColorInput.addEventListener('input', function() {
+                let color = this.value;
+                // 确保颜色值以#开头
+                if (!color.startsWith('#')) {
+                    color = '#' + color;
+                }
+                
+                // 验证颜色格式
+                const colorRegex = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
+                if (colorRegex.test(color)) {
+                    bgColorPicker.value = color;
+                    applyBackgroundColor(color);
+                    saveSettings();
+                }
+            });
+            
+            // 颜色输入框失去焦点时验证
+            bgColorInput.addEventListener('blur', function() {
+                let color = this.value;
+                // 确保颜色值以#开头
+                if (!color.startsWith('#')) {
+                    color = '#' + color;
+                }
+                
+                // 验证颜色格式
+                const colorRegex = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
+                if (!colorRegex.test(color)) {
+                    // 如果格式不正确，恢复为上一个有效值
+                    this.value = bgColorPicker.value;
+                } else {
+                    // 标准化为6位十六进制
+                    if (color.length === 4) {
+                        const r = color[1];
+                        const g = color[2];
+                        const b = color[3];
+                        color = `#${r}${r}${g}${g}${b}${b}`;
+                        this.value = color;
+                    }
+                    bgColorPicker.value = color;
+                    applyBackgroundColor(color);
+                    saveSettings();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
