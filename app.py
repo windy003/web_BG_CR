@@ -3,6 +3,7 @@ import requests , string
 from bs4 import BeautifulSoup
 import re
 import html
+import time
 
 app = Flask(__name__)
 
@@ -23,76 +24,93 @@ def index():
         else:
             return render_template('index.html', content="请提供有效的URL或书名、章数和版本号")
         
-        # 发送请求获取内容
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-        }
-        
-        try:
-            response = requests.get(url, headers=headers)
-            response.raise_for_status()  # 如果请求失败，抛出异常
-        except Exception as e:
-            return render_template('index.html', content=f"获取内容失败: {str(e)}")
-        
-        soup = BeautifulSoup(response.text, 'html.parser')
-        
-        # 提取标题
-        title_element = soup.find('h1')
-        title = clean_text(title_element.text) if title_element else '无标题'
-        
-        # 找到经文内容
-        passage_content = soup.find('div', class_='passage-content')
-        if not passage_content:
-            return render_template('index.html', content="无法找到经文内容")
-        
-        chapter_text = []
-        
-        # 提取章节标题
-        chapter_title = soup.find('div', class_='dropdown-display-text')
-        if chapter_title:
-            chapter_text.append(f"<h2>{clean_text(chapter_title.text)}</h2>")
-        
-        # 提取经文
-        verses = passage_content.find_all(['p', 'h3', 'h4'])
-        
-        for verse in verses:
-            # 检查是否为段落标题
-            if verse.name in ['h3', 'h4']:
-                clean_verse_text = clean_text(verse.text)
-                if clean_verse_text:
-                    chapter_text.append(f"<br><strong>{clean_verse_text}</strong><br>")
-            else:
-                # 清理文本
-                clean_verse_text = clean_text(verse.text)
-                if clean_verse_text and not clean_verse_text.startswith('Footnotes') and not clean_verse_text.startswith('Cross references'):
-                    chapter_text.append(clean_verse_text)
-        
-        # 处理脚注
-        footnotes_section = soup.find('div', class_='footnotes')
-        if footnotes_section:
-            chapter_text.append("<br><strong>脚注</strong><br>")
-            footnote_items = footnotes_section.find_all('li')
+
+
+        if chapter == '0':
+            chapter_num = 1
             
-             # 创建小写字母列表
-            footnote_markers = list(string.ascii_lowercase)
-            for i, item in enumerate(footnote_items):
-                if i < len(footnote_markers):
-                    marker = footnote_markers[i]
-                    full_text = item.get_text(separator=' ', strip=True)
-                    # 确保脚注标记正确显示
-                    if not full_text.startswith(marker):
-                        full_text = f"{marker} {full_text}"
-                    chapter_text.append(full_text)
+            print(f"Scraping chapter {chapter_num}...")
+
+            chapterTitles_subtitles = scrape_chapter_titles_subtitles(book, version, chapter_num)
+
+            chapterTitles_subtitles = "<br>".join(chapterTitles_subtitles)
+
+            return render_template('index.html', title=f"{book}的所有标题和子标题", content=chapterTitles_subtitles, url=url)
 
 
 
-        # 正确连接列表元素
-        formatted_content = "<br>".join(chapter_text)
-        
-        # 最后一次清理，确保没有遗漏
-        formatted_content = clean_text(formatted_content)
-        
-        return render_template('index.html', title=title, content=formatted_content, url=url)
+
+        else:
+            # 发送请求获取内容
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+            }
+            
+            try:
+                response = requests.get(url, headers=headers)
+                response.raise_for_status()  # 如果请求失败，抛出异常
+            except Exception as e:
+                return render_template('index.html', content=f"获取内容失败: {str(e)}")
+            
+            soup = BeautifulSoup(response.text, 'html.parser')
+            
+            # 提取标题
+            title_element = soup.find('h1')
+            title = clean_text(title_element.text) if title_element else '无标题'
+            
+            # 找到经文内容
+            passage_content = soup.find('div', class_='passage-content')
+            if not passage_content:
+                return render_template('index.html', content="无法找到经文内容")
+            
+            chapter_text = []
+            
+            # 提取章节标题
+            chapter_title = soup.find('div', class_='dropdown-display-text')
+            if chapter_title:
+                chapter_text.append(f"<h2>{clean_text(chapter_title.text)}</h2>")
+            
+            # 提取经文
+            verses = passage_content.find_all(['p', 'h3', 'h4'])
+            
+            for verse in verses:
+                # 检查是否为段落标题
+                if verse.name in ['h3', 'h4']:
+                    clean_verse_text = clean_text(verse.text)
+                    if clean_verse_text:
+                        chapter_text.append(f"<br><strong>{clean_verse_text}</strong><br>")
+                else:
+                    # 清理文本
+                    clean_verse_text = clean_text(verse.text)
+                    if clean_verse_text and not clean_verse_text.startswith('Footnotes') and not clean_verse_text.startswith('Cross references'):
+                        chapter_text.append(clean_verse_text)
+            
+            # 处理脚注
+            footnotes_section = soup.find('div', class_='footnotes')
+            if footnotes_section:
+                chapter_text.append("<br><strong>脚注</strong><br>")
+                footnote_items = footnotes_section.find_all('li')
+                
+                # 创建小写字母列表
+                footnote_markers = list(string.ascii_lowercase)
+                for i, item in enumerate(footnote_items):
+                    if i < len(footnote_markers):
+                        marker = footnote_markers[i]
+                        full_text = item.get_text(separator=' ', strip=True)
+                        # 确保脚注标记正确显示
+                        if not full_text.startswith(marker):
+                            full_text = f"{marker} {full_text}"
+                        chapter_text.append(full_text)
+
+
+
+            # 正确连接列表元素
+            formatted_content = "<br>".join(chapter_text)
+            
+            # 最后一次清理，确保没有遗漏
+            formatted_content = clean_text(formatted_content)
+            
+            return render_template('index.html', title=title, content=formatted_content, url=url)
     
     return render_template('index.html')
 
@@ -102,7 +120,7 @@ def clean_text(text):
         return ""
     
     # 使用正则表达式替换所有空白字符（包括\xa0）为单个空格
-    text = re.sub(r'\s+', ' ', text)
+    # text = re.sub(r'\s+', ' ', text)
     
     # 确保没有\xa0（虽然上面的正则应该已经处理了，但为了保险起见）
     text = text.replace('\xa0', ' ')
@@ -111,6 +129,80 @@ def clean_text(text):
     text = text.strip()
     
     return text
+
+
+def scrape_chapter_titles_subtitles(book_name, version="CSBS", start_chapter=1):
+    
+    all_titles_subtitles = []
+    chapter_num = start_chapter
+    
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+    }
+    
+    while True:
+        # 构建URL
+        url = f"https://www.biblegateway.com/passage/?search={book_name}+{chapter_num}&version={version}"
+        
+        try:
+            # 发送请求获取内容
+            response = requests.get(url, headers=headers)
+            response.raise_for_status()  # 如果请求失败，抛出异常
+            
+            soup = BeautifulSoup(response.text, 'html.parser')
+            
+            # 找到经文内容
+            passage_content = soup.find('div', class_='passage-content')
+            if not passage_content:
+                print(f"章节 {chapter_num} 没有内容，可能已到达最后一章")
+                break
+
+            
+            
+            # 提取章节标题
+            chapter_title = soup.find('div', class_='dropdown-display-text')
+            chapter_title_text = clean_text(chapter_title.text) if chapter_title else f"{book_name} 第 {chapter_num} 章"
+            
+            chapter_title_text = "<br>" + chapter_title_text + "<br>"
+
+            all_titles_subtitles.append(chapter_title_text)
+
+            # 提取子标题
+            subtitles = []
+            subtitle_elements = passage_content.find_all(['h3'])
+            
+            for subtitle in subtitle_elements:
+                clean_subtitle_text = clean_text(subtitle.text)
+                if clean_subtitle_text:
+                    all_titles_subtitles.append(clean_subtitle_text)
+            
+
+            
+            print(f"成功爬取 {book_name} 第 {chapter_num} 章的标题和子标题")
+            
+            # 检查是否为空白章
+            verses = passage_content.find_all('p')
+            verse_text = ' '.join([clean_text(verse.text) for verse in verses])
+            if not verse_text or verse_text.strip() == "":
+                print(f"章节 {chapter_num} 内容为空，已到达最后一章")
+                break
+            
+            # 增加章节号
+            chapter_num += 1
+            
+            # 添加延迟，避免请求过于频繁
+            time.sleep(1)
+            
+        except Exception as e:
+            print(f"爬取 {book_name} 第 {chapter_num} 章时出错: {str(e)}")
+            # 如果是404错误，可能已到达最后一章
+            if hasattr(e, 'response') and e.response.status_code == 404:
+                print(f"章节 {chapter_num} 不存在，已到达最后一章")
+                break
+            # 其他错误，尝试下一章
+            chapter_num += 1
+    
+    return all_titles_subtitles
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001, debug=True) 
