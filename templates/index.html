@@ -620,6 +620,107 @@
             overflow: hidden;
         }
 
+        /* 扩展内容样式，铺满页面 */
+        .expanded-content {
+            background-color: #F2F0E9;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-top: 15px;
+            line-height: 1.6;
+            min-height: 80vh; /* 至少占据视口高度的80% */
+            overflow-y: auto;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* 移除全屏相关的样式 */
+        .fullscreen-btn {
+            display: none;
+        }
+
+        /* 添加翻页按钮 */
+        .page-buttons-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .page-nav-button {
+            display: block;
+            width: 80px;
+            height: 40px;
+            margin-bottom: 10px;
+            background-color: rgba(0,0,0,0.7);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .page-nav-button:last-child {
+            margin-bottom: 0;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .expanded-content {
+                padding: 15px;
+                min-height: 85vh; /* 在移动设备上占据更多空间 */
+            }
+        }
+
+        /* 全页面内容样式 - 直接铺满页面，没有方框边界 */
+        .full-page-content {
+            padding: 20px 0; /* 只保留上下内边距，移除左右内边距 */
+            margin-top: 15px;
+            line-height: 1.6;
+            background-color: transparent; /* 透明背景 */
+            border: none; /* 移除边框 */
+            box-shadow: none; /* 移除阴影 */
+            width: 100%; /* 占满容器宽度 */
+        }
+
+        /* 修改容器样式，使内容可以更宽 */
+        .container {
+            max-width: 1000px; /* 增加最大宽度 */
+            margin: 0 auto;
+            background-color: transparent; /* 容器背景透明 */
+            padding: 20px;
+            border-radius: 0; /* 移除圆角 */
+            box-shadow: none; /* 移除阴影 */
+        }
+
+        /* 修改整体页面背景 */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #F2F0E9; /* 设置整个页面的背景色 */
+            color: #333; /* 文本颜色 */
+        }
+
+        /* 确保内容区域有足够的高度 */
+        #contentDisplay {
+            min-height: 70vh; /* 至少占据视口高度的70% */
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .full-page-content {
+                padding: 10px 0;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -648,12 +749,11 @@
         <div class="chapter-info" id="chapterInfo">
             {% if title %}<h2>{{ title }}</h2>{% endif %}
         </div>
-        <div class="content-container">
-            <button id="fullscreenBtn" class="fullscreen-btn">全屏显示</button>
-            <div id="contentDisplay" class="content-display">
-                {% if content %}{{ content | safe }}{% endif %}
-            </div>
-        </div>
+        
+        <!-- 修改这里：移除容器和方框，直接显示内容 -->
+        <p  id="p_tag" >
+            {% if content %}{{ content | safe }}{% endif %}
+        </p>
     </div>
 
     <!-- 控制面板 -->
@@ -695,12 +795,7 @@
         </div>
     </div>
 
-    <!-- 全屏模式弹窗 -->
-    <div id="fullscreenModal" class="fullscreen-modal">
-        <!-- 将退出全屏按钮改为悬浮样式 -->
-        <button id="closeFullscreenBtn" class="close-fullscreen-btn floating-btn">退出全屏</button>
-        <div id="fullscreenContent" class="fullscreen-content"></div>
-    </div>
+   
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -714,7 +809,7 @@
             // 字体大小控制
             const fontSizeSlider = document.getElementById('fontSize');
             const fontSizeInput = document.getElementById('fontSizeInput');
-            const contentDisplay = document.getElementById('contentDisplay');
+            const contentDisplay = document.getElementById('p_tag');
             
             // 字间距控制
             const letterSpacingSlider = document.getElementById('letterSpacing');
@@ -872,36 +967,6 @@
                 isDragging = false;
             });
             
-            // 全屏模式
-            fullscreenBtn.addEventListener('click', function() {
-                // 复制内容到全屏容器
-                fullscreenContent.innerHTML = contentDisplay.innerHTML;
-                
-                // 应用相同的样式设置到全屏内容
-                applySettings(fullscreenContent);
-                
-                // 显示全屏模态框
-                fullscreenModal.style.display = 'block';
-                
-                // 禁止body滚动
-                document.body.classList.add('fullscreen-mode');
-            });
-            
-            // 退出全屏模式
-            closeFullscreenBtn.addEventListener('click', function() {
-                // 隐藏全屏模态框
-                fullscreenModal.style.display = 'none';
-                
-                // 恢复body滚动
-                document.body.classList.remove('fullscreen-mode');
-            });
-            
-            // 添加ESC键退出全屏
-            document.addEventListener('keydown', function(event) {
-                if (event.key === 'Escape' && fullscreenModal.style.display === 'block') {
-                    closeFullscreenBtn.click();
-                }
-            });
             
             // 初始化控制面板状态
             controlPanel.style.display = 'none'; // 默认隐藏控制面板
