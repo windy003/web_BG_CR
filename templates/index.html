@@ -6,6 +6,22 @@
     <title>圣经章节阅读器</title>
     <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='180x180.png') }}"> 
 
+    <link rel="apple-touch-icon" sizes="114x114" href="{{ url_for('static', filename='114x114.png') }}">
+
+    <link rel="icon" sizes="192x192" href="{{ url_for('static', filename='192x192.png') }}">
+
+        <!-- UC浏览器Speed Dial图标 -->
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="{{ url_for('static', filename='114x114.png') }}">
+    <link rel="apple-touch-icon" sizes="114x114" href="{{ url_for('static', filename='114x114.png') }}">
+    <!-- 备用方法 -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="圣经章节阅读器">
+
+    <meta property="og:image" content="{{ url_for('static', filename='192x192.png') }}">    
+    <meta name="twitter:image" content="{{ url_for('static', filename='192x192.png') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='192x192.png') }}" type="image/png">
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -434,13 +450,18 @@
         }
 
         /* 添加箭头图标样式 */
-        .arrow-up {
+         .arrow-up {
             width: 0;
             height: 0;
             border-left: 10px solid transparent;
             border-right: 10px solid transparent;
             border-bottom: 15px solid white;
         }
+
+ */
+
+
+
 
     </style>
 </head>
