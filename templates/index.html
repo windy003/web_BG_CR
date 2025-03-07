@@ -542,6 +542,14 @@
             const panelContent = document.querySelector('.panel-content');
             const dragHandle = document.getElementById('dragHandle');
             
+            // 获取表单输入元素
+            const bookInput = document.getElementById('bookInput');
+            const chapterInput = document.getElementById('chapterInput');
+            const versionInput = document.getElementById('versionInput');
+            const urlInput = document.getElementById('urlInput');
+            const bibleForm = document.getElementById('bibleForm');
+            const urlForm = document.getElementById('urlForm');
+            
             // 字体大小控制
             const fontSizeSlider = document.getElementById('fontSize');
             const fontSizeInput = document.getElementById('fontSizeInput');
@@ -576,7 +584,6 @@
                     lineHeightSlider.value = settings.lineHeight;
                     lineHeightInput.value = settings.lineHeight;
                     
-                    
                     // 应用设置到内容显示区域
                     applySettings(contentDisplay);
                 }
@@ -594,7 +601,6 @@
                     font-size: ${settings.fontSize}px !important;
                     letter-spacing: ${settings.letterSpacing}px !important;
                     line-height: ${settings.lineHeight} !important;
-                    
                 `;
                 
                 // 遍历所有子元素并应用样式
@@ -664,7 +670,6 @@
                 applySettings(contentDisplay);
                 saveSettings();
             });
-            
             
             // 拖动控制面板功能
             let isDragging = false;
@@ -825,6 +830,47 @@
                     }
                 }
             });
+
+            // ===== 新增：记住上次输入的功能 =====
+            
+            // 从localStorage加载上次输入的值
+            function loadLastInputs() {
+                const lastInputs = localStorage.getItem('bibleReaderLastInputs');
+                if (lastInputs) {
+                    const inputs = JSON.parse(lastInputs);
+                    
+                    // 填充书名、章数和版本输入框
+                    if (inputs.book) bookInput.value = inputs.book;
+                    if (inputs.chapter) chapterInput.value = inputs.chapter;
+                    if (inputs.version) versionInput.value = inputs.version;
+                    
+                    // 填充URL输入框
+                    if (inputs.url) urlInput.value = inputs.url;
+                }
+            }
+            
+            // 保存输入值到localStorage
+            function saveInputs() {
+                const inputs = {
+                    book: bookInput.value,
+                    chapter: chapterInput.value,
+                    version: versionInput.value,
+                    url: urlInput.value
+                };
+                localStorage.setItem('bibleReaderLastInputs', JSON.stringify(inputs));
+            }
+            
+            // 监听表单提交事件，保存输入值
+            bibleForm.addEventListener('submit', function() {
+                saveInputs();
+            });
+            
+            urlForm.addEventListener('submit', function() {
+                saveInputs();
+            });
+            
+            // 页面加载时，填充上次输入的值
+            loadLastInputs();
         });
     </script>
 </body>
