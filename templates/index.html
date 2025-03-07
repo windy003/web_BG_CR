@@ -522,11 +522,7 @@
                 <input type="number" id="lineHeightInput" min="1" max="2.5" value="1.5" step="0.1">
             </div>
             
-            <label for="bgColor">背景颜色:</label>
-            <div class="color-container">
-                <input type="color" id="bgColorPicker" value="#F2F0E9">
-                <input type="text" id="bgColorInput" value="#F2F0E9" maxlength="7">
-            </div>
+           
         </div>
     </div>
 
@@ -559,16 +555,11 @@
             const lineHeightSlider = document.getElementById('lineHeight');
             const lineHeightInput = document.getElementById('lineHeightInput');
             
-            // 背景颜色控制
-            const bgColorPicker = document.getElementById('bgColorPicker');
-            const bgColorInput = document.getElementById('bgColorInput');
-            
             // 设置对象，用于保存所有设置
             let settings = {
                 fontSize: '16',
                 letterSpacing: '1',
                 lineHeight: '1.5',
-                bgColor: '#F2F0E9'
             };
             
             // 从localStorage加载设置
@@ -584,8 +575,7 @@
                     letterSpacingInput.value = settings.letterSpacing;
                     lineHeightSlider.value = settings.lineHeight;
                     lineHeightInput.value = settings.lineHeight;
-                    bgColorPicker.value = settings.bgColor;
-                    bgColorInput.value = settings.bgColor;
+                    
                     
                     // 应用设置到内容显示区域
                     applySettings(contentDisplay);
@@ -604,7 +594,7 @@
                     font-size: ${settings.fontSize}px !important;
                     letter-spacing: ${settings.letterSpacing}px !important;
                     line-height: ${settings.lineHeight} !important;
-                    background-color: ${settings.bgColor} !important;
+                    
                 `;
                 
                 // 遍历所有子元素并应用样式
@@ -675,20 +665,6 @@
                 saveSettings();
             });
             
-            // 背景颜色控制
-            bgColorPicker.addEventListener('input', function() {
-                settings.bgColor = this.value;
-                bgColorInput.value = settings.bgColor;
-                applySettings(contentDisplay);
-                saveSettings();
-            });
-            
-            bgColorInput.addEventListener('input', function() {
-                settings.bgColor = this.value;
-                bgColorPicker.value = settings.bgColor;
-                applySettings(contentDisplay);
-                saveSettings();
-            });
             
             // 拖动控制面板功能
             let isDragging = false;
