@@ -33,7 +33,7 @@ def index():
 
             chapterTitles_subtitles = scrape_chapter_titles_subtitles(book, version, chapter_num)
 
-            chapterTitles_subtitles = "<br>".join(chapterTitles_subtitles)
+            chapterTitles_subtitles = "<br><br>".join(chapterTitles_subtitles)
 
             return render_template('index.html', title=f"{book}的所有标题和子标题", content=chapterTitles_subtitles, url=url)
 
