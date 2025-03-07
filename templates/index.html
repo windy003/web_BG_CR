@@ -215,57 +215,8 @@
         }
         
         
-       
-        
-       
-        
-        
-        
-        /* 当处于全屏模式时，隐藏滚动条 */
-        body.fullscreen-mode {
-            overflow: hidden !important; /* 使用!important确保优先级 */
-        }
 
-        /* 全屏模式样式 */
-        #contentDisplay.fullscreen-active {
-            background-color: white;
-            padding: 20px;
-            margin: 0;
-            width: 100%;
-            height: 100%;
-            overflow-y: auto;
-            box-sizing: border-box;
-        }
         
-        /* 确保全屏元素占满整个屏幕 */
-        :fullscreen, ::backdrop {
-            background-color: white;
-        }
-        
-        /* 兼容不同浏览器的全屏样式 */
-        :-webkit-full-screen #contentDisplay {
-            width: 100%;
-            height: 100%;
-            background-color: white;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-        
-        :-moz-full-screen #contentDisplay {
-            width: 100%;
-            height: 100%;
-            background-color: white;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-        
-        :-ms-fullscreen #contentDisplay {
-            width: 100%;
-            height: 100%;
-            background-color: white;
-            padding: 20px;
-            box-sizing: border-box;
-        }
 
         /* 颜色选择器容器样式 */
         .color-container {
@@ -320,20 +271,7 @@
         }
 
 
-        /* 全屏模式样式 */
-        .fullscreen-mode {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #f9f9f9;
-            z-index: 2000;
-            overflow: auto;
-            overflow-x: hidden;
-            padding: 0px;
-            box-sizing: border-box;
-        }
+        
 
         /* 模态框样式 */
         .modal {
@@ -408,43 +346,7 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
-        
 
-        
-
-        /* 全屏模态框样式 */
-        .fullscreen-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: white;
-            z-index: 9999;
-            overflow: auto;
-            overflow-x: hidden;
-        }
-
-        
-
-        
-
-
-        
-
-        /* 确保全屏模态框占满整个屏幕 */
-        .fullscreen-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #F2F0E9;
-            z-index: 9999;
-            overflow: hidden;
-        }
 
         /* 扩展内容样式，铺满页面 */
         .expanded-content {
