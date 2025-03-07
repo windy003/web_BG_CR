@@ -99,7 +99,7 @@ def index():
                         full_text = item.get_text(separator=' ', strip=True)
                         # 确保脚注标记正确显示
                         if not full_text.startswith(marker):
-                            full_text = f"{marker} {full_text}"
+                            full_text = f"<br>{marker} {full_text}<br>"
                         chapter_text.append(full_text)
 
 
