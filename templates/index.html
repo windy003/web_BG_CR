@@ -242,39 +242,13 @@
         .panel-content.collapsed {
             display: none;
         }
-        /* 全屏相关样式 */
-        .fullscreen-container {
-            position: relative;
-            margin-top: 20px;
-        }
         
-        .fullscreen-btn {
-            position: absolute;
-            top: 0;
-            right: 0;
-            z-index: 10;
-            padding: 5px 10px;
-            background-color: #555;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-        }
         
-        .fullscreen-btn:hover {
-            background-color: #333;
-        }
+       
         
        
         
         
-        .fullscreen-content {
-            overflow-x: hidden;
-            padding: 20px;
-            line-height: 1.6;
-            min-height: 100px; /* 设置最小高度 */
-        }
         
         /* 当处于全屏模式时，隐藏滚动条 */
         body.fullscreen-mode {
@@ -450,15 +424,7 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);  /* 添加阴影效果 */
         }
 
-        /* 如果您想让整个内容区域有边框，也可以添加以下样式 */
-        .fullscreen-container {
-            background-color: #f9f9f9;
-            padding: 15px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            margin-top: 20px;
-            position: relative;
-        }
+        
 
         /* 内容容器样式 */
         .content-container {
@@ -471,24 +437,7 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
-        /* 全屏按钮样式 */
-        .fullscreen-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            padding: 5px 10px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            z-index: 10;
-        }
-
-        .fullscreen-btn:hover {
-            background-color: #45a049;
-        }
+        
 
         
 
@@ -508,56 +457,8 @@
 
         
 
-        .close-fullscreen-btn {
-            padding: 5px 10px;
-            background-color: #f44336;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-        }
+        
 
-        .close-fullscreen-btn:hover {
-            background-color: #d32f2f;
-        }
-
-        .fullscreen-content {
-            padding: 20px;
-            line-height: 1.6;
-        }
-
-        /* 悬浮退出全屏按钮样式 */
-        .close-fullscreen-btn.floating-btn {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 2000;
-            padding: 8px 15px;
-            background-color: rgba(244, 67, 54, 0.8); /* 半透明红色背景 */
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-            transition: all 0.3s ease;
-        }
-
-        .close-fullscreen-btn.floating-btn:hover {
-            background-color: rgba(244, 67, 54, 1); /* 悬停时不透明 */
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-        }
-
-        /* 修改全屏内容区域，确保占满整个屏幕 */
-        .fullscreen-content {
-            width: 100%;
-            height: 100%;
-            padding: 20px;
-            box-sizing: border-box;
-            overflow-y: auto;
-            background-color: #F2F0E9; /* 使用与正常模式相同的背景色 */
-        }
 
         
 
@@ -587,10 +488,7 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
-        /* 移除全屏相关的样式 */
-        .fullscreen-btn {
-            display: none;
-        }
+        
 
         /* 添加翻页按钮 */
         .page-buttons-container {
