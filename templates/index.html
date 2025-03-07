@@ -266,14 +266,7 @@
             background-color: #333;
         }
         
-        .content-display {
-            background-color: white;
-            padding: 15px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            margin-top: 10px;
-            line-height: 1.6;
-        }
+       
         
         
         
@@ -521,11 +514,7 @@
             background-color: #45a049;
         }
 
-        /* 内容显示区域样式 */
-        .content-display {
-            margin-top: 30px; /* 为全屏按钮留出空间 */
-            line-height: 1.6;
-        }
+        
 
         /* 全屏模态框样式 */
         .fullscreen-modal {
@@ -721,6 +710,13 @@
             }
         }
 
+        /* 确保p标签内的所有元素都继承样式 */
+        #di * {
+            font-family: inherit;
+            line-height: inherit;
+            letter-spacing: inherit;
+        }
+
     </style>
 </head>
 <body>
@@ -750,10 +746,10 @@
             {% if title %}<h2>{{ title }}</h2>{% endif %}
         </div>
         
-        <!-- 修改这里：移除容器和方框，直接显示内容 -->
-        <p  id="p_tag" >
+        <!-- 使用div替代p标签 -->
+        <div id="div_tag" >
             {% if content %}{{ content | safe }}{% endif %}
-        </p>
+        </div>
     </div>
 
     <!-- 控制面板 -->
@@ -809,7 +805,7 @@
             // 字体大小控制
             const fontSizeSlider = document.getElementById('fontSize');
             const fontSizeInput = document.getElementById('fontSizeInput');
-            const contentDisplay = document.getElementById('p_tag');
+            const contentDisplay = document.getElementById('div_tag');
             
             // 字间距控制
             const letterSpacingSlider = document.getElementById('letterSpacing');
@@ -822,12 +818,6 @@
             // 背景颜色控制
             const bgColorPicker = document.getElementById('bgColorPicker');
             const bgColorInput = document.getElementById('bgColorInput');
-            
-            // 全屏相关元素
-            const fullscreenBtn = document.getElementById('fullscreenBtn');
-            const fullscreenModal = document.getElementById('fullscreenModal');
-            const fullscreenContent = document.getElementById('fullscreenContent');
-            const closeFullscreenBtn = document.getElementById('closeFullscreenBtn');
             
             // 设置对象，用于保存所有设置
             let settings = {
@@ -863,12 +853,25 @@
                 localStorage.setItem('bibleReaderSettings', JSON.stringify(settings));
             }
             
-            // 应用设置到指定元素
+            // 应用设置到指定元素及其所有子元素
             function applySettings(element) {
-                element.style.fontSize = settings.fontSize + 'px';
-                element.style.letterSpacing = settings.letterSpacing + 'px';
-                element.style.lineHeight = settings.lineHeight;
-                element.style.backgroundColor = settings.bgColor;
+                // 设置主元素样式
+                element.style.cssText = `
+                    font-size: ${settings.fontSize}px !important;
+                    letter-spacing: ${settings.letterSpacing}px !important;
+                    line-height: ${settings.lineHeight} !important;
+                    background-color: ${settings.bgColor} !important;
+                `;
+                
+                // 遍历所有子元素并应用样式
+                const children = element.querySelectorAll('*');
+                children.forEach(child => {
+                    child.style.cssText = `
+                        font-size: ${settings.fontSize}px !important;
+                        letter-spacing: ${settings.letterSpacing}px !important;
+                        line-height: ${settings.lineHeight} !important;
+                    `;
+                });
             }
             
             // 显示/隐藏控制面板
@@ -884,6 +887,7 @@
             
             // 字体大小控制
             fontSizeSlider.addEventListener('input', function() {
+                console.log('字体大小改变:', this.value);
                 settings.fontSize = this.value;
                 fontSizeInput.value = settings.fontSize;
                 applySettings(contentDisplay);
@@ -973,6 +977,18 @@
             
             // 加载保存的设置
             loadSettings();
+
+            // 方法1：使用MutationObserver监听内容变化
+            const contentObserver = new MutationObserver(function(mutations) {
+                // 当内容发生变化时，重新应用样式
+                applySettings(contentDisplay);
+            });
+
+            // 配置观察选项
+            const config = { childList: true, subtree: true };
+
+            // 开始观察
+            contentObserver.observe(contentDisplay, config);
         });
     </script>
 </body>
