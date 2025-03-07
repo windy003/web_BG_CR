@@ -1036,18 +1036,6 @@
             // 加载保存的设置
             loadSettings();
 
-            // 方法1：使用MutationObserver监听内容变化
-            const contentObserver = new MutationObserver(function(mutations) {
-                // 当内容发生变化时，重新应用样式
-                applySettings(contentDisplay);
-            });
-
-            // 配置观察选项
-            const config = { childList: true, subtree: true };
-
-            // 开始观察
-            contentObserver.observe(contentDisplay, config);
-
             // 悬浮球功能
             const floatingBall = document.getElementById('floatingBall');
 
