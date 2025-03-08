@@ -871,6 +871,57 @@
             
             // 页面加载时，填充上次输入的值
             loadLastInputs();
+
+            // 获取章节信息元素
+            const chapterInfo = document.getElementById('chapterInfo');
+            
+            // 添加一个函数来更新页面标题
+            function updatePageTitle() {
+                // 获取章节信息中的标题文本
+                let chapterTitle = "";
+                
+                // 尝试获取 h2 标签中的内容
+                const h2Element = chapterInfo.querySelector('h2');
+                if (h2Element) {
+                    chapterTitle = h2Element.textContent.trim();
+                } else {
+                    // 如果没有 h2 标签，则使用整个元素的文本内容
+                    chapterTitle = chapterInfo.textContent.trim();
+                }
+                
+                // 如果有章节标题，则更新页面标题
+                if (chapterTitle) {
+                    // 设置新的页面标题：章节标题 + 原始标题
+                    document.title = chapterTitle + " - 圣经章节阅读器";
+                }
+            }
+            
+            // 初始检查是否已有章节信息
+            updatePageTitle();
+            
+            // 使用 MutationObserver 监听章节信息的变化
+            const observer = new MutationObserver(function(mutations) {
+                // 延迟执行更新标题，确保 DOM 已完全更新
+                setTimeout(updatePageTitle, 100);
+            });
+            
+            // 配置 observer 监听章节信息元素的子节点和文本变化
+            observer.observe(chapterInfo, {
+                childList: true,
+                subtree: true,
+                characterData: true
+            });
+            
+            // 监听表单提交事件，在加载新章节后更新标题
+            bibleForm.addEventListener('submit', function() {
+                // 保存输入值
+                saveInputs();
+            });
+            
+            urlForm.addEventListener('submit', function() {
+                // 保存输入值
+                saveInputs();
+            });
         });
     </script>
 </body>
