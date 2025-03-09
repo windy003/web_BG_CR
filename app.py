@@ -202,7 +202,17 @@ def index():
                 }
                 
                 sup a:hover, .footnote-back:hover {
-                    text-decoration: underline;
+                    text-decoration: none;
+                }
+                
+                /* 全局移除所有下划线 */
+                * {
+                    text-decoration: none !important;
+                }
+                
+                /* 如果只想移除链接的下划线 */
+                a {
+                    text-decoration: none !important;
                 }
             </style>
             """
@@ -224,6 +234,9 @@ def clean_text(text):
     
     # 去除首尾空白
     text = text.strip()
+    
+    # 移除所有下划线，但保留下划线上的字符
+    text = text.replace('_', '')
     
     return text
 
