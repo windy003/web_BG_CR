@@ -73,6 +73,9 @@ def index():
             # 提取经文
             verses = passage_content.find_all(['p', 'h3', 'h4'])
             
+            # 用于存储已处理的脚注标记
+            processed_footnotes = {}  # 使用字典存储脚注ID和对应的元素
+
             for verse in verses:
                 # 检查是否为段落标题
                 if verse.name in ['h3', 'h4']:
@@ -81,34 +84,131 @@ def index():
                         chapter_text.append(f"<br><strong>{clean_verse_text}</strong><br>")
                 else:
                     # 清理文本
-                    clean_verse_text = clean_text(verse.text)
-                    if clean_verse_text and not clean_verse_text.startswith('Footnotes') and not clean_verse_text.startswith('Cross references'):
-                        chapter_text.append(clean_verse_text)
+                    if verse.text and not verse.text.startswith('Footnotes') and not verse.text.startswith('Cross references'):
+                        # 查找所有脚注上标
+                        footnote_sups = verse.find_all('sup', class_='footnote')
+                        
+                        if footnote_sups:
+                            # 创建verse的副本以便修改
+                            verse_copy = BeautifulSoup(str(verse), 'html.parser')
+                            
+                            # 处理每个脚注上标
+                            for sup in verse_copy.find_all('sup', class_='footnote'):
+                                # 获取脚注ID
+                                footnote_id = sup.get('data-fn')
+                                if footnote_id and footnote_id.startswith('#'):
+                                    footnote_id = footnote_id[1:]  # 移除开头的#号
+                                    
+                                    # 为上标添加ID
+                                    sup['id'] = f"footnote-ref-{footnote_id}"
+                                    
+                                    # 记录脚注信息
+                                    processed_footnotes[footnote_id] = {
+                                        'ref_id': f"footnote-ref-{footnote_id}",
+                                        'letter': sup.text.strip('[]')  # 移除方括号
+                                    }
+                            
+                            # 添加修改后的HTML
+                            chapter_text.append(str(verse_copy))
+                        else:
+                            # 如果没有脚注，直接添加原始文本
+                            clean_verse_text = clean_text(verse.text)
+                            if clean_verse_text:
+                                chapter_text.append(clean_verse_text)
             
-            # 处理脚注
+            # 打印处理结果
+            print(f"处理了 {len(processed_footnotes)} 个上标脚注: {', '.join(processed_footnotes.keys())}")
+
+            # 在处理脚注上标后
+            for footnote_id, info in processed_footnotes.items():
+                print(f"脚注ID: {footnote_id}, 字母: {info['letter']}, 引用ID: {info['ref_id']}")
+
+            # 处理脚注部分
             footnotes_section = soup.find('div', class_='footnotes')
+            print(f"找到脚注容器: {footnotes_section is not None}")
+            
             if footnotes_section:
                 chapter_text.append("<br><strong>脚注</strong><br>")
-                footnote_items = footnotes_section.find_all('li')
                 
-                # 创建小写字母列表
-                footnote_markers = list(string.ascii_lowercase)
+                # 尝试多种方式获取脚注项
+                footnote_items = footnotes_section.find_all('li')
+                print(f"脚注项数量 (li): {len(footnote_items)}")
+                
+                # 在处理脚注项时
                 for i, item in enumerate(footnote_items):
-                    if i < len(footnote_markers):
-                        marker = footnote_markers[i]
-                        full_text = item.get_text(separator=' ', strip=True)
-                        # 确保脚注标记正确显示
-                        if not full_text.startswith(marker):
-                            full_text = f"<br>{marker} {full_text}<br>"
-                        chapter_text.append(full_text)
+                    print(f"脚注项 {i}:")
+                    print(f"  ID: {item.get('id')}")
+                    print(f"  文本: {item.get_text(separator=' ', strip=True)[:50]}...")  # 打印前50个字符
+                    print(f"  HTML: {str(item)[:100]}...")  # 打印前100个字符
+                
+                # 处理每个脚注项
+                footnote_links_added = 0
+                for i, item in enumerate(footnote_items):
 
+                    letter = string.ascii_lowercase[i % 26]
+                    
+                    # 获取脚注文本
+                    full_text = item.get_text(separator=' ', strip=True)
+                    
+                    
+                    # 尝试匹配脚注ID
+                    matched_id = None
+                    
 
-
+                    print(f"processed_footnotes: {processed_footnotes}")
+                    # 方法1：通过ID属性匹配
+                    item_id = item.get('id')
+                    if item_id and item_id in processed_footnotes:
+                        matched_id = item_id
+                    
+                    
+                    
+                    # 如果找到匹配的ID，添加返回链接
+                    if matched_id:
+                        ref_info = processed_footnotes[matched_id]
+                        footnote_html = f'<div id="{matched_id}"><a href="#{ref_info["ref_id"]}" title="返回原文" class="footnote-back">{letter}</a>{full_text}</div>'
+                        chapter_text.append(footnote_html)
+                        footnote_links_added += 1
+                    else:
+                        # 如果没有匹配，直接添加文本
+                        chapter_text.append(f"<div>{full_text}</div>")
+                
+                print(f"添加了 {footnote_links_added} 个底部脚注链接")
+            
+            # 调试代码
+            if footnotes_section:
+                print("脚注HTML结构:", str(verse))
+            
             # 正确连接列表元素
             formatted_content = "<br>".join(chapter_text)
             
             # 最后一次清理，确保没有遗漏
             formatted_content = clean_text(formatted_content)
+            
+            # 添加CSS样式
+            footnote_styles = """
+            <style>
+                .footnote-back {
+                    text-decoration: none;
+                    color: #0066cc;
+                    font-size: 0.8em;
+                    vertical-align: super;
+                    margin-left: 2px;
+                }
+                
+                sup a {
+                    text-decoration: none;
+                    color: #0066cc;
+                }
+                
+                sup a:hover, .footnote-back:hover {
+                    text-decoration: underline;
+                }
+            </style>
+            """
+
+            # 在返回模板前添加样式
+            formatted_content = footnote_styles + formatted_content
             
             return render_template('index.html', title=title, content=formatted_content, url=url)
     
@@ -119,10 +219,7 @@ def clean_text(text):
     if not text:
         return ""
     
-    # 使用正则表达式替换所有空白字符（包括\xa0）为单个空格
-    # text = re.sub(r'\s+', ' ', text)
-    
-    # 确保没有\xa0（虽然上面的正则应该已经处理了，但为了保险起见）
+    # 只替换特殊空白字符，保留HTML标签
     text = text.replace('\xa0', ' ')
     
     # 去除首尾空白
