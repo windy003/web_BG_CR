@@ -10,6 +10,7 @@ services:
       - FLASK_APP=app.py
       - FLASK_ENV=production
     volumes:
+      - ./instance:/app/instance:rw
       - /etc/letsencrypt/live/windy.run/fullchain.pem:/etc/ssl/certs/fullchain.pem:ro
       - /etc/letsencrypt/live/windy.run/privkey.pem:/etc/ssl/certs/privkey.pem:ro
     user: "1000:1000"  # 使用宿主机的UID:GID
@@ -29,3 +30,5 @@ services:
               "--access-logformat", "%(h)s %(l)s %(u)s %(t)s '%(r)s' %(s)s %(b)s '%(f)s' '%(a)s'",  # 添加自定义日志格式
               "app:app"]
 
+volumes:
+  instance:

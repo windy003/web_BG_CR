@@ -458,10 +458,10 @@
             border-bottom: 15px solid white;
         }
 
- */
-
-
-
+        input::placeholder {
+            color: #999; !important/* 使用浅灰色 */
+            opacity: 1; !important /* 确保不透明 */
+        }
 
     </style>
 </head>
@@ -474,12 +474,15 @@
         <form method="POST" action="/" id="bibleForm">
             <div class="input-container">
                 <input type="text" id="bookInput" name="book" placeholder="书名 (如: 马太福音)" style="width: 150px;" required>
-                <input type="number" id="chapterInput" name="chapter" placeholder="章数" min="0" style="width: 60px;" required>
+                <input type="number" id="chapterInput" name="chapter" placeholder="章数" min="-1" step="0.1" style="width: 60px;" required>
                 <input type="text" id="versionInput" name="version" placeholder="版本 (如: CSBS)" style="width: 80px;" value="CSBS" required>
                 <button type="submit">加载章节</button>
             </div>
         </form>
-        
+
+        <div  style="font-size: 18px; color: #0d0c0c;  white-space: normal;" >在章节处输入<div style="color: red;">0.1</div>:爬取整张的标题和子标题,并存入数据库,输入<div style="color: red;">0</div>:从数据库中读取这章的标题和子标题
+        </div>
+
         <!-- 或者保留原有的URL输入区域作为备选 -->
         <div class="input-container">
             <form method="POST" action="/" id="urlForm">
@@ -512,7 +515,7 @@
 
             <label for="letterSpacing">字间距 (px):</label>
             <div class="slider-container">
-                <input type="range" id="letterSpacing" min="0" max="20" value="1" step="0.1">
+                <input type="range" id="letterSpacing" min="0" max="40" value="1" step="0.1">
                 <input type="number" id="letterSpacingInput" min="0" max="20" value="1" step="0.1">
             </div>
 

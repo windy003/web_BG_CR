@@ -7,7 +7,7 @@ services:
     ports:
       - "5001:5001"
     volumes:
-      - .:/app
+      - ./instance:/app/instance:rw  # 明确指定读写权限
     environment:
       FLASK_ENV: development
     restart: always
@@ -23,3 +23,7 @@ services:
               "--error-logfile", "-",
               "--bind", "0.0.0.0:5001",
               "app:app"]
+
+
+volumes:
+  instance:
