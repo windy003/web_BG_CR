@@ -47,13 +47,16 @@ def index():
             chapter = request.form['chapter']
             version = request.form['version']
             
-            # 检查是否是特殊章节号
-            if chapter == '0.1':
-                # 爬取标题和子标题并存入数据库
-                return crawl_and_save_titles(book, version)
-            elif chapter == '0':
+            # # 检查是否是特殊章节号
+            # if chapter == '0.1':
+            #     # 爬取标题和子标题并存入数据库
+            #     return crawl_and_save_titles(book, version)
+            if chapter == '0':
                 # 从数据库读取标题和子标题
-                return load_titles_from_db(book, version)
+                if check_db_exists(book, version):
+                    return load_titles_from_db(book, version)
+                else:
+                    return crawl_and_save_titles(book, version)
             else:
                 # 正常加载章节
                 return load_chapter(book, chapter, version)
@@ -166,6 +169,22 @@ def scrape_chapter_titles_subtitles(book_name, version="CSBS", start_chapter=1):
     
     return all_titles_subtitles
 
+
+def  check_db_exists(book, version):
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT titles_subtitles FROM chapter_titles WHERE book = ? AND version = ?",
+        (book, version)
+    )
+
+    results = cursor.fetchall()
+    conn.close()
+
+    if not results or not results[0][0]:
+        return False
+    else:
+        return True
 
 def load_titles_from_db(book, version):
     conn = sqlite3.connect(DB_PATH)
