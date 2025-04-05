@@ -451,7 +451,6 @@
     </style>
 </head>
 <body>
-    <a id="top" style="position: absolute; top: 0;"></a>
     <div class="container">
         <h1>圣经章节阅读器</h1>
         
@@ -519,32 +518,16 @@
             // 检查元素是否存在
             if (!bookInput || !chapterInput || !versionInput) {
                 console.warn('圣经查询输入框不存在，无法启用记忆功能');
+                return;
             }
             
             if (!bibleForm) {
                 console.warn('圣经查询表单不存在，无法保存输入值');
-            }
-            
-            // 检查 localStorage 是否可用
-            function isLocalStorageAvailable() {
-                try {
-                    const test = '__test__';
-                    localStorage.setItem(test, test);
-                    localStorage.removeItem(test);
-                    return true;
-                } catch (e) {
-                    console.error('localStorage 不可用:', e);
-                    return false;
-                }
+                return;
             }
             
             // 从 localStorage 加载上次输入的值
             function loadLastInputs() {
-                if (!isLocalStorageAvailable()) {
-                    console.warn('localStorage 不可用，无法加载上次输入值');
-                    return;
-                }
-                
                 try {
                     const lastInputs = localStorage.getItem('bibleReaderLastInputs');
                     console.log('尝试加载保存的输入值:', lastInputs);
@@ -553,19 +536,19 @@
                         const inputs = JSON.parse(lastInputs);
                         
                         // 填充书名输入框
-                        if (bookInput && inputs.book) {
+                        if (inputs.book) {
                             bookInput.value = inputs.book;
                             console.log('恢复书名输入值:', inputs.book);
                         }
                         
                         // 填充章数输入框
-                        if (chapterInput && inputs.chapter) {
+                        if (inputs.chapter) {
                             chapterInput.value = inputs.chapter;
                             console.log('恢复章数输入值:', inputs.chapter);
                         }
                         
                         // 填充版本输入框
-                        if (versionInput && inputs.version) {
+                        if (inputs.version) {
                             versionInput.value = inputs.version;
                             console.log('恢复版本输入值:', inputs.version);
                         }
@@ -581,16 +564,11 @@
             
             // 保存输入值到 localStorage
             function saveInputs() {
-                if (!isLocalStorageAvailable()) {
-                    console.warn('localStorage 不可用，无法保存输入值');
-                    return;
-                }
-                
                 try {
                     const inputs = {
-                        book: bookInput ? bookInput.value : '',
-                        chapter: chapterInput ? chapterInput.value : '',
-                        version: versionInput ? versionInput.value : '',
+                        book: bookInput.value,
+                        chapter: chapterInput.value,
+                        version: versionInput.value,
                         timestamp: new Date().toISOString() // 添加时间戳以便调试
                     };
                     
@@ -602,26 +580,11 @@
                 }
             }
             
-            // 安全地添加事件监听器
-            function addSafeEventListener(element, event, callback) {
-                if (element) {
-                    element.addEventListener(event, callback);
-                    return true;
-                }
-                return false;
-            }
-            
             // 为表单添加提交事件监听器，保存输入值
-            if (addSafeEventListener(bibleForm, 'submit', function() {
+            bibleForm.addEventListener('submit', function() {
                 console.log('圣经查询表单提交，保存输入值');
                 saveInputs();
-            })) {
-                console.log('已为圣经查询表单添加提交事件监听器');
-            }
-            
-            
-            // 可选：启用输入值变化监听器
-            // addInputChangeListeners();
+            });
             
             // 页面加载时，加载上次输入的值
             console.log('开始加载上次输入的值');
@@ -786,6 +749,8 @@
             // 加载保存的设置
             loadSettings();
 
+
+        }
            
     </script>
 </body>
