@@ -813,6 +813,10 @@
             loadSettings();
 
 
+            floatingButton.addEventListener('click', function() {
+                controlPanel.style.display = controlPanel.style.display === 'none' || controlPanel.style.display === '' ? 'block' : 'none';
+            });
+
         })
            
     </script>
