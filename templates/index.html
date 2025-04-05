@@ -109,6 +109,20 @@
             font-size: 16px;
         }
 
+
+        /* 阅读进度条样式 */
+        .reading-progress-bar {
+            position: fixed;
+            right: 0;
+            top: 0;
+            width: 4px;
+            height: 0;
+            background-color:#4caf50;
+            z-index: 9999;
+            transition: height 0.1s;
+        }
+        
+
         /* 移动端适配 */
         @media (max-width: 768px) {
             .control-panel {
