@@ -480,14 +480,7 @@
             </div>
         </form>
 
-        <!-- 或者保留原有的URL输入区域作为备选 -->
-        <div class="input-container">
-            <form method="POST" action="/" id="urlForm">
-                <input type="text" id="urlInput" name="url" placeholder="或直接输入BibleGateway网址" style="width: 300px;">
-                <button type="submit">加载内容</button>
-            </form>
-            <button id="showPanelBtn" class="panel-toggle-btn">显示控制面板</button>
-        </div>
+        <button id="showPanelBtn" class="panel-toggle-btn">显示控制面板</button>
         
         <div class="chapter-info" id="chapterInfo">
             {% if title %}<h2>{{ title }}</h2>{% endif %}
