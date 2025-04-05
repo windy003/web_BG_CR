@@ -619,25 +619,6 @@
                 console.log('已为圣经查询表单添加提交事件监听器');
             }
             
-            // 添加输入值变化监听器 (可选功能，实时保存)
-            function addInputChangeListeners() {
-                const inputElements = [bookInput, chapterInput, versionInput];
-                
-                inputElements.forEach(input => {
-                    if (input) {
-                        input.addEventListener('change', function() {
-                            console.log('输入值变化，保存最新值');
-                            saveInputs();
-                        });
-                        
-                        // 也可以监听 input 事件，实现更实时的保存
-                        // input.addEventListener('input', function() {
-                        //     console.log('输入值实时变化，保存最新值');
-                        //     saveInputs();
-                        // });
-                    }
-                });
-            }
             
             // 可选：启用输入值变化监听器
             // addInputChangeListeners();
