@@ -532,6 +532,25 @@
             const progressBar = document.getElementById('readingProgressBar');
 
 
+            // 更新阅读进度条函数
+            function updateReadingProgress() {
+                const windowHeight = window.innerHeight;
+                const documentHeight = document.documentElement.scrollHeight - windowHeight;
+                const scrollTop = window.scrollY;
+                const progress = (scrollTop / documentHeight) * 100;
+                progressBar.style.height = `${progress}%`;
+                floatingButton.textContent = `${Math.round(progress)}`;
+            }
+             
+            // 监听滚动事件以更新进度条
+            window.addEventListener('scroll', updateReadingProgress);
+            // 页面加载和调整大小时更新进度条
+            window.addEventListener('load', updateReadingProgress);
+            window.addEventListener('resize', updateReadingProgress);
+           
+
+
+
             // 检查元素是否存在
             if (!bookInput || !chapterInput || !versionInput) {
                 console.warn('圣经查询输入框不存在，无法启用记忆功能');
