@@ -828,6 +828,12 @@
                 controlPanel.style.display = controlPanel.style.display === 'none' || controlPanel.style.display === '' ? 'block' : 'none';
             });
 
+            // 获取 chapter-info 中的 title
+            const chapterTitle = document.querySelector('.chapter-info h2');
+            if (chapterTitle) {
+                // 将 chapter-info 中的 title 设置为页面的 title
+                document.title = chapterTitle.innerText;
+            }
         })
            
     </script>
