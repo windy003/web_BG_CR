@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-QFDHV9GJ5V"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-QFDHV9GJ5V');
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>圣经章节阅读器</title>
@@ -499,6 +508,7 @@
     <!-- 输入和显示区域 -->
     <div class="container">
         <h1>圣经章节阅读器</h1>
+        <p style="font-style: italic;margin:20px">中文阅读圣经是不是因为字太密了,不方便阅读,那这个网站就是为你所准备的,可以自由调节字体大小,字间距,行间距,让你更舒适的阅读圣经,输入参数后,打开的网页,选择悬浮窗就可以调节了,有问题可以联系作者:Windy Zhou,微信号:trust030703,欢迎打赏支持</p>
         
         <!-- 添加直接提交到后端的表单 -->
         <form method="POST" action="/" id="bibleForm">
@@ -510,6 +520,7 @@
             </div>
         </form>
 
+        <p style="font-style: italic;margin:20px">常见的版本英文:NIV,KJV;中文:CSBS,CCB,大家可以到:https://www.biblegateway.com/这个网站查看寻找相应的版本</p>
         
         <div class="chapter-info" id="chapterInfo">
             {% if title %}<h2>{{ title }}</h2>{% endif %}
